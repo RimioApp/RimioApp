@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "523264101537",
+    "project_id": "rimio-190cd",
+    "storage_bucket": "rimio-190cd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:523264101537:android:1d0f664fc99c0a10f334e0",
+        "android_client_info": {
+          "package_name": "com.example.music_market"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "523264101537-8lv0tukqqderecrkhkd00dud6sd4kp64.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.music_market",
+            "certificate_hash": "f73327643c9bda5a0e881d28ea67f0e1be3d6c4a"
+          }
+        },
+        {
+          "client_id": "523264101537-l20lhuab9m8olvfjeo7hpr0t3jk41p9l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbt-xbVKnUQu59PI4G-KdAU9ZsXff4BVg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "523264101537-l20lhuab9m8olvfjeo7hpr0t3jk41p9l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "523264101537-22c33dd7hbg8obj0fi6035lluht9ln08.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.musicMarket.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
