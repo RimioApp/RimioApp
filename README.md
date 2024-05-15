@@ -1,6 +1,5 @@
-# music_market
+# Rimio
 
-A new Flutter project.
 
 ## Getting Started
 
