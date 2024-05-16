@@ -599,10 +599,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                             height: 30,
                             width: 100,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(50),
+                              color: Colors.grey.shade100,
                             ),
-                            child: Text(getCurrentProduct.productState, style: const TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis),)),
+                            child: Text(getCurrentProduct.productState, style: const TextStyle(color: Colors.black54, overflow: TextOverflow.ellipsis),)),
                         const SizedBox(width: 120,),
                         Container(
                             height: 50,
