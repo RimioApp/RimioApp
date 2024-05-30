@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerWidget extends StatelessWidget {
-  const ImagePickerWidget({super.key, this.imagedPicked, required this.function});
+  const ImagePickerWidget(
+      {super.key, this.imagedPicked, required this.function, this.fix,this.height});
 
   final XFile? imagedPicked;
   final Function()? function;
+  final fix;
+  final height;
 
   @override
   Widget build(BuildContext context) {
@@ -19,19 +22,24 @@ class ImagePickerWidget extends StatelessWidget {
             padding: const EdgeInsets.all(1.0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
-              child: imagedPicked == null ?
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.deepPurpleAccent,
-                  border: Border.all(width: 0),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-              ) : Container(
-                width: 200,
-                height: 200,
-                child: Image.file(File(imagedPicked!.path), fit: BoxFit.contain,
-            ),
-              ),
+              child: imagedPicked == null
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurpleAccent,
+                        border: Border.all(width: 0),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    )
+                  : Container(
+                      width: 200,
+                      height: double.parse((height ?? 200).toString()),
+                      child: Image.file(
+                        File(
+                          imagedPicked!.path,
+                        ),
+                        fit: fix ?? BoxFit.contain,
+                      ),
+                    ),
             ),
           ),
           Positioned(
@@ -44,7 +52,11 @@ class ImagePickerWidget extends StatelessWidget {
                 color: Colors.grey.shade100,
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.add_photo_alternate, color: Colors.deepPurple, size: 20,),
+                  child: Icon(
+                    Icons.add_photo_alternate,
+                    color: Colors.deepPurple,
+                    size: 20,
+                  ),
                 )),
           ),
         ],

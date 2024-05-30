@@ -22,7 +22,7 @@ class UserProvider with ChangeNotifier {
     try{
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-      final userDocDict = userDoc.data() as Map<String, dynamic>?;
+      final userDocDict = userDoc.data();
 
       userModel = UserModel(
           userId: userDoc.get('userId'),
@@ -31,7 +31,7 @@ class UserProvider with ChangeNotifier {
           displayName: userDoc.get('displayName'),
           phone: userDoc.get('phone'),
           location: userDoc.get('location'),
-          userImage: userDoc.get('userImage'),
+          userImage: userDoc.get('userImage')??"",
           userEmail: userDoc.get('userEmail'),
           createdAt: userDoc.get('createdAt'),
           points: userDoc.get('points'),

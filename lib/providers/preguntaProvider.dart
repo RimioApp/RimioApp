@@ -46,6 +46,7 @@ class PreguntaProvider with ChangeNotifier {
         'remitente': displayName,
         'imagen': userImage,
         'pregunta': pregunta,
+        'user_id':user.uid,
         'createAt':Timestamp.now(),
 
       });

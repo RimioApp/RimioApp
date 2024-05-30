@@ -1,40 +1,33 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:Rimio/providers/product_provider.dart';
 import 'package:Rimio/providers/vistoReciente_provider.dart';
-import 'package:Rimio/view/models/product_model.dart';
 import 'package:Rimio/view/productDetails.dart';
-import 'package:Rimio/view/searchPage.dart';
 import 'package:Rimio/widgets/customButton.dart';
 import 'package:Rimio/widgets/fav_button.dart';
 import 'package:Rimio/widgets/itemTile.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart';
 
 class ProductWidget extends StatefulWidget {
- const ProductWidget({super.key, required this.productId,});
+  const ProductWidget(
+      {super.key, required this.productId, this.isUserHistory = false});
 
- final String productId;
+  final String productId;
+  final bool isUserHistory;
 
   @override
   State<ProductWidget> createState() => _ProductWidgetState();
 }
 
 class _ProductWidgetState extends State<ProductWidget> {
-
   late String textToShare;
   late String imageUrl;
 
-
   Future<void> shareToWhatsApp(String text, String imageUrl) async {
-    final String whatsAppUrl = 'whatsapp://send?text=$text&source=$imageUrl&data=$imageUrl';
+    final String whatsAppUrl =
+        'whatsapp://send?text=$text&source=$imageUrl&data=$imageUrl';
 
     try {
       await launch(whatsAppUrl);
@@ -45,35 +38,30 @@ class _ProductWidgetState extends State<ProductWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     // final productModelProvider = Provider.of<ProductModel>(context);
     final productsProvider = Provider.of<ProductsProvider>(context);
     final getCurrentProduct = productsProvider.findByProdId(widget.productId);
     final vistoRecienteProvider = Provider.of<VistoRecienteProvider>(context);
 
-    return getCurrentProduct!.publicar == false
+    return getCurrentProduct!.publicar == false && !widget.isUserHistory
         ? const Padding(
-          padding: EdgeInsets.all(50.0),
-          child: Center(child: CircularProgressIndicator()),
-        )
+            padding: EdgeInsets.all(50.0),
+            child: Center(child: CircularProgressIndicator()),
+          )
         : GestureDetector(
-      onTap: (){
-        vistoRecienteProvider.addToVistolistFirebase(productId: getCurrentProduct.productId, context: context);
-        Navigator.pushNamed(context, ProductDetails.routeName, arguments: getCurrentProduct.productId);
-      },
-
-      child: Container(
+            onTap: () {
+              vistoRecienteProvider.addToVistolistFirebase(
+                  productId: getCurrentProduct.productId, context: context);
+              Navigator.pushNamed(context, ProductDetails.routeName,
+                  arguments: getCurrentProduct.productId);
+            },
+            child: Container(
               height: 300,
               width: 250,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15),
-                boxShadow: const [
-                  BoxShadow(
-                      blurRadius: 2,
-                      color: Colors.grey
-                  )
-                ],
+                boxShadow: const [BoxShadow(blurRadius: 2, color: Colors.grey)],
               ),
               child: Column(
                 children: [
@@ -82,34 +70,39 @@ class _ProductWidgetState extends State<ProductWidget> {
                     width: 250,
                     decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12)
-                    ),
+                        borderRadius: BorderRadius.circular(12)),
                     child: Stack(
                       children: [
                         FancyShimmerImage(
                             boxFit: BoxFit.contain,
                             height: double.maxFinite,
-                              width: double.maxFinite,
-                              imageUrl:  getCurrentProduct.productImage1),
-                        FavButton(productId: getCurrentProduct.productId, size: 25, bkgColor: Colors.white,),
+                            width: double.maxFinite,
+                            imageUrl: getCurrentProduct.productImage1),
+                        FavButton(
+                          productId: getCurrentProduct.productId,
+                          size: 25,
+                          bkgColor: Colors.white,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Container(
-                              height: 35,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
+                                height: 35,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
                                 child: IconButton(
                                     onPressed: () async {
-
-                                      await Share.share('${getCurrentProduct.productImage1}\n¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, '
-                                          '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
+                                      // await Share.share(
+                                      //     '${getCurrentProduct.productImage1}\n¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, '
+                                      //     '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
 
                                       // await shareToWhatsApp(
                                       //   '¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, ¡Descarga la App YA!',
                                       //     getCurrentProduct.productImage1);
+
+                                      shareLink(getCurrentProduct.productId);
                                     },
                                     icon: const Icon(Icons.share))),
                           ],
@@ -122,7 +115,12 @@ class _ProductWidgetState extends State<ProductWidget> {
                     padding: const EdgeInsets.only(left: 8),
                     child: Row(
                       children: [
-                        Flexible(child: Text(getCurrentProduct.productTitle, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600),)),
+                        Flexible(
+                            child: Text(
+                          getCurrentProduct.productTitle,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        )),
                       ],
                     ),
                   ),
@@ -132,18 +130,30 @@ class _ProductWidgetState extends State<ProductWidget> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                            alignment: const Alignment(0,0),
+                            alignment: const Alignment(0, 0),
                             height: 20,
                             width: 50,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
                               color: Theme.of(context).primaryColor,
                             ),
-                            child: Text(getCurrentProduct.productState, style: const TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis),)),
+                            child: Text(
+                              getCurrentProduct.productState,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  overflow: TextOverflow.ellipsis),
+                            )),
                         Row(
                           children: [
-                            const Icon(Icons.location_pin, size: 15, color: Colors.deepPurple,),
-                            Text(getCurrentProduct.userLocation, style: const TextStyle(fontSize: 12, overflow: TextOverflow.ellipsis)),
+                            const Icon(
+                              Icons.location_pin,
+                              size: 15,
+                              color: Colors.deepPurple,
+                            ),
+                            Text(getCurrentProduct.userLocation,
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    overflow: TextOverflow.ellipsis)),
                           ],
                         )
                       ],
@@ -154,27 +164,39 @@ class _ProductWidgetState extends State<ProductWidget> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(getCurrentProduct.servicio ? '\$${getCurrentProduct.productPrice}':'\$${getCurrentProduct.productPrice}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.red),),
+                        Text(
+                          getCurrentProduct.servicio
+                              ? '\$${getCurrentProduct.productPrice}'
+                              : '\$${getCurrentProduct.productPrice}',
+                          style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.red),
+                        ),
                         SizedBox(
-                          child:
-                          CustomButton(
-                            onTap: () async {
-                              await showDialog(context: context, builder: (context){
-                                return AlertDialog(
-                                  title: Text(getCurrentProduct.productTitle),
-                                  content: Text(getCurrentProduct.productDescription),
-                                );
-                              });
-                            },
-                              height: 38,
-                              width: 80,
-                              color: Colors.deepPurple,
-                              radius: 8,
-                              text: 'Detalles',
-                              fontSize: 15,
-                              textColor: Colors.white,
-                              shadow: 2.5,
-                              colorShadow: Colors.grey)/*Material(
+                            child: CustomButton(
+                                onTap: () async {
+                                  await showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text(
+                                              getCurrentProduct.productTitle),
+                                          content: Text(getCurrentProduct
+                                              .productDescription),
+                                        );
+                                      });
+                                },
+                                height: 38,
+                                width: 80,
+                                color: Colors.deepPurple,
+                                radius: 8,
+                                text: 'Detalles',
+                                fontSize: 15,
+                                textColor: Colors.white,
+                                shadow: 2.5,
+                                colorShadow: Colors
+                                    .grey) /*Material(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -187,13 +209,13 @@ class _ProductWidgetState extends State<ProductWidget> {
                                     padding: EdgeInsets.all(8.0),
                                     child: Icon(Icons.add_shopping_cart_rounded, color: Colors.deepPurple,),
                                   ))),*/
-                        ),
+                            ),
                       ],
                     ),
                   )
                 ],
               ),
-          ),
-        );
+            ),
+          );
   }
 }

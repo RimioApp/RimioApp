@@ -23,6 +23,7 @@ class ProductsProvider with ChangeNotifier{
   }
 
   ProductModel? findByProdId (String productId){
+    var pro = products;
     if (products.where((element) => element.productId == productId).isEmpty){
       return null;
     }

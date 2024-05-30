@@ -1,14 +1,11 @@
 import 'dart:io';
 
-import 'package:Rimio/providers/product_provider.dart';
 import 'package:Rimio/providers/publish_provider.dart';
 import 'package:Rimio/providers/user_provider.dart';
-import 'package:Rimio/view/authPages/login.dart';
 import 'package:Rimio/view/models/product_model.dart';
 import 'package:Rimio/view/models/user_model.dart';
 import 'package:Rimio/view/searchPage.dart';
 import 'package:Rimio/widgets/customButton.dart';
-import 'package:Rimio/widgets/image_picker_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -17,19 +14,22 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-
 class EditOrUploadProductScreen extends StatefulWidget {
   static const routeName = '/EditOrUploadProductScreen';
-  const EditOrUploadProductScreen({super.key, this.productModel,});
+
+  const EditOrUploadProductScreen({
+    super.key,
+    this.productModel,
+  });
 
   final ProductModel? productModel;
 
   @override
-  State<EditOrUploadProductScreen> createState() => _EditOrUploadProductScreenState();
+  State<EditOrUploadProductScreen> createState() =>
+      _EditOrUploadProductScreenState();
 }
 
 class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
-
   late TextEditingController _titleController,
       _priceController,
       _descriptionController;
@@ -51,17 +51,20 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
 
   @override
   void initState() {
-    if (widget.productModel != null){
+    if (widget.productModel != null) {
       isEditing = true;
       productNetworkImage1 = widget.productModel!.productImage1;
       productNetworkImage2 = widget.productModel!.productImage2;
       productNetworkImage3 = widget.productModel!.productImage3;
       productNetworkImage4 = widget.productModel!.productImage4;
     }
-    _titleController = TextEditingController(text: widget.productModel?.productTitle);
-    _priceController = TextEditingController(text: widget.productModel?.productPrice);
+    _titleController =
+        TextEditingController(text: widget.productModel?.productTitle);
+    _priceController =
+        TextEditingController(text: widget.productModel?.productPrice);
     _stateValue = widget.productModel?.productState;
-    _descriptionController = TextEditingController(text: widget.productModel?.productDescription);
+    _descriptionController =
+        TextEditingController(text: widget.productModel?.productDescription);
     _categoryValue = widget.productModel?.productCategory;
     fetchUserInfo();
     super.initState();
@@ -128,9 +131,9 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
 
   List<DropdownMenuItem<String>>? get categoriesDropDownList {
     List<DropdownMenuItem<String>>? menuItem =
-    List<DropdownMenuItem<String>>.generate(
+        List<DropdownMenuItem<String>>.generate(
       categoriesList.length,
-          (index) => DropdownMenuItem(
+      (index) => DropdownMenuItem(
         value: categoriesList[index],
         child: Text(categoriesList[index]),
       ),
@@ -140,9 +143,9 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
 
   List<DropdownMenuItem<String>>? get locationDropDownList {
     List<DropdownMenuItem<String>>? menuItem =
-    List<DropdownMenuItem<String>>.generate(
+        List<DropdownMenuItem<String>>.generate(
       locationList.length,
-          (index) => DropdownMenuItem(
+      (index) => DropdownMenuItem(
         value: locationList[index],
         child: Text(locationList[index]),
       ),
@@ -152,9 +155,9 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
 
   List<DropdownMenuItem<String>>? get stateDropDownList {
     List<DropdownMenuItem<String>>? menuItem =
-    List<DropdownMenuItem<String>>.generate(
+        List<DropdownMenuItem<String>>.generate(
       stateList.length,
-          (index) => DropdownMenuItem(
+      (index) => DropdownMenuItem(
         value: stateList[index],
         child: Text(stateList[index]),
       ),
@@ -168,48 +171,77 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
   XFile? _pickedImage4;
 
   void localPickImage() async {
-    await showDialog(context: context, builder: (context){
-      return AlertDialog(
-        title: const Center(child: Text('Elije una opción')),
-        content: SizedBox(
-          height: 170,
-          width: 150,
-          child: Column(
-            children: [
-              const SizedBox(height: 5,),
-              TextButton.icon(
-                onPressed: (){
-                  camaraPicker();
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.camera_alt_rounded, color: Colors.deepPurple, size: 30,),
-                label: const Text('Cámara', style: TextStyle(fontSize: 18),),
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Center(child: Text('Elije una opción')),
+            content: SizedBox(
+              height: 170,
+              width: 150,
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      camaraPicker();
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: Colors.deepPurple,
+                      size: 30,
+                    ),
+                    label: const Text(
+                      'Cámara',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      galeriaPicker1();
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.image,
+                      color: Colors.deepPurple,
+                      size: 30,
+                    ),
+                    label: const Text(
+                      'Galería',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      _pickedImage1 = null;
+                      productNetworkImage1 = null;
+                      setState(() {});
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.clear,
+                      color: Colors.redAccent,
+                      size: 30,
+                    ),
+                    label: const Text(
+                      'Eliminar',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5,),
-              TextButton.icon(
-                onPressed: (){
-                  galeriaPicker1();
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.image, color: Colors.deepPurple, size: 30,),
-                label: const Text('Galería', style: TextStyle(fontSize: 18),),
-              ),
-              const SizedBox(height: 5,),
-              TextButton.icon(
-                onPressed: (){
-                  _pickedImage1 = null;
-                  productNetworkImage1 = null;
-                  setState(() {});
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.clear, color: Colors.redAccent, size: 30,),
-                label: const Text('Eliminar', style: TextStyle(fontSize: 18),),
-              ),
-            ],
-          ),
-        ),
-      );
-    });
+            ),
+          );
+        });
   }
 
   Future<void> camaraPicker() async {
@@ -217,21 +249,25 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
     _pickedImage1 = await imagePicker.pickImage(source: ImageSource.camera);
     setState(() {});
   }
+
   Future<void> galeriaPicker1() async {
     final ImagePicker imagePicker = ImagePicker();
     _pickedImage1 = await imagePicker.pickImage(source: ImageSource.gallery);
     setState(() {});
   }
+
   Future<void> galeriaPicker2() async {
     final ImagePicker imagePicker = ImagePicker();
     _pickedImage2 = await imagePicker.pickImage(source: ImageSource.gallery);
     setState(() {});
   }
+
   Future<void> galeriaPicker3() async {
     final ImagePicker imagePicker = ImagePicker();
     _pickedImage3 = await imagePicker.pickImage(source: ImageSource.gallery);
     setState(() {});
   }
+
   Future<void> galeriaPicker4() async {
     final ImagePicker imagePicker = ImagePicker();
     _pickedImage4 = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -260,7 +296,6 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final publishProvider = Provider.of<PublishProvider>(context);
 
     return Scaffold(
@@ -271,7 +306,8 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
-                color: Colors.white38,),
+                color: Colors.white38,
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Form(
@@ -292,20 +328,21 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: [
-                                if(isEditing == true) ... [
+                                if (isEditing == true) ...[
                                   if (_pickedImage1 == null)
                                     GestureDetector(
                                       onTap: galeriaPicker1,
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Stack(
-                                          children:[
+                                          children: [
                                             ClipRRect(
-                                              borderRadius: BorderRadius.circular(21),
+                                              borderRadius:
+                                                  BorderRadius.circular(21),
                                               child: GestureDetector(
-                                                onTap: galeriaPicker1,
-                                                child: Image.network(productNetworkImage1!)
-                                              ),
+                                                  onTap: galeriaPicker1,
+                                                  child: Image.network(
+                                                      productNetworkImage1!)),
                                             ),
                                             /*IconButton(
                                             onPressed: (){setState(() {
@@ -315,38 +352,44 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                                           ],
                                         ),
                                       ),
-                                    ) else Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    child: Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(21),
-                                          child: GestureDetector(
-                                            onTap: galeriaPicker1,
-                                            child: Image.file(File(_pickedImage1!.path)),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(21),
+                                            child: GestureDetector(
+                                              onTap: galeriaPicker1,
+                                              child: Image.file(
+                                                  File(_pickedImage1!.path)),
+                                            ),
                                           ),
-                                        ),
-                                        /*IconButton(
+                                          /*IconButton(
                                             onPressed: (){setState(() {
                                               _pickedImage4 = null;
                                             });},
                                             icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))*/
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
                                   if (_pickedImage2 == null)
                                     GestureDetector(
                                       onTap: galeriaPicker2,
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Stack(
-                                          children:[
+                                          children: [
                                             ClipRRect(
-                                              borderRadius: BorderRadius.circular(21),
+                                              borderRadius:
+                                                  BorderRadius.circular(21),
                                               child: GestureDetector(
                                                   onTap: galeriaPicker2,
-                                                  child: Image.network(productNetworkImage2!)
-                                              ),
+                                                  child: Image.network(
+                                                      productNetworkImage2!)),
                                             ),
                                             /*IconButton(
                                             onPressed: (){setState(() {
@@ -356,36 +399,20 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                                           ],
                                         ),
                                       ),
-                                    ) else Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    child: Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(21),
-                                          child: GestureDetector(
-                                            onTap: galeriaPicker2,
-                                            child: Image.file(File(_pickedImage2!.path)),
-                                          ),
-                                        ),
-                                        /*IconButton(
-                                            onPressed: (){setState(() {
-                                              _pickedImage4 = null;
-                                            });},
-                                            icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))*/
-                                      ],
-                                    ),
-                                  ),
-                                  if (_pickedImage3 == null) GestureDetector(
-                                    onTap: galeriaPicker3,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
                                       child: Stack(
-                                        children:[
+                                        children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(21),
+                                            borderRadius:
+                                                BorderRadius.circular(21),
                                             child: GestureDetector(
-                                                onTap: galeriaPicker3,
-                                                child: Image.network(productNetworkImage3!)
+                                              onTap: galeriaPicker2,
+                                              child: Image.file(
+                                                  File(_pickedImage2!.path)),
                                             ),
                                           ),
                                           /*IconButton(
@@ -396,36 +423,43 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                                         ],
                                       ),
                                     ),
-                                  ) else Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    child: Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(21),
-                                          child: GestureDetector(
-                                            onTap: galeriaPicker3,
-                                            child: Image.file(File(_pickedImage3!.path)),
-                                          ),
-                                        ),
-                                        /*IconButton(
+                                  if (_pickedImage3 == null)
+                                    GestureDetector(
+                                      onTap: galeriaPicker3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(21),
+                                              child: GestureDetector(
+                                                  onTap: galeriaPicker3,
+                                                  child: Image.network(
+                                                      productNetworkImage3!)),
+                                            ),
+                                            /*IconButton(
                                             onPressed: (){setState(() {
                                               _pickedImage4 = null;
                                             });},
                                             icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))*/
-                                      ],
-                                    ),
-                                  ),
-                                  if (_pickedImage4 == null) GestureDetector(
-                                    onTap: galeriaPicker4,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
                                       child: Stack(
-                                        children:[
+                                        children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(21),
+                                            borderRadius:
+                                                BorderRadius.circular(21),
                                             child: GestureDetector(
-                                                onTap: galeriaPicker4,
-                                                child: Image.network(productNetworkImage4!)
+                                              onTap: galeriaPicker3,
+                                              child: Image.file(
+                                                  File(_pickedImage3!.path)),
                                             ),
                                           ),
                                           /*IconButton(
@@ -436,206 +470,312 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                                         ],
                                       ),
                                     ),
-                                  ) else Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    child: Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(21),
-                                          child: GestureDetector(
-                                            onTap: galeriaPicker4,
-                                            child: Image.file(File(_pickedImage4!.path)),
-                                          ),
-                                        ),
-                                        /*IconButton(
+                                  if (_pickedImage4 == null)
+                                    GestureDetector(
+                                      onTap: galeriaPicker4,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(21),
+                                              child: GestureDetector(
+                                                  onTap: galeriaPicker4,
+                                                  child: Image.network(
+                                                      productNetworkImage4!)),
+                                            ),
+                                            /*IconButton(
                                             onPressed: (){setState(() {
                                               _pickedImage4 = null;
                                             });},
                                             icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))*/
-                                      ],
-                                    ),
-                                  ),
-                                ] else ... [
-                                if (_pickedImage1 == null)
-                                  GestureDetector(
-                                  onTap: galeriaPicker1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Stack(
-                                      children:[
-                                        Container(
-                                          width: 150,
-                                          decoration: BoxDecoration(
-                                            color: Colors.black54,
-                                            borderRadius: BorderRadius.circular(21),
-                                          ),
-                                        ),
-                                        const Positioned(
-                                            right: 60,
-                                            top: 70,
-                                            child: Icon(Icons.add_photo_alternate_outlined, color: Colors.white,))
-                                      ],
-                                    ),
-                                  ),
-                                ) else Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(21),
-                                        child: GestureDetector(
-                                          onTap: galeriaPicker1,
-                                          child: Image.file(File(_pickedImage1!.path)),
+                                          ],
                                         ),
                                       ),
-                                      IconButton(
-                                          onPressed: (){setState(() {
-                                            _pickedImage1 = null;
-                                          });},
-                                          icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))
-                                    ],
-                                  ),
-                                ),
-                                if (_pickedImage2 == null)
-                                  GestureDetector(
-                                    onTap: galeriaPicker2,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
                                       child: Stack(
-                                        children:[
-                                          Container(
-                                            width: 150,
-                                            decoration: BoxDecoration(
-                                              color: Colors.black54,
-                                              borderRadius: BorderRadius.circular(21),
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(21),
+                                            child: GestureDetector(
+                                              onTap: galeriaPicker4,
+                                              child: Image.file(
+                                                  File(_pickedImage4!.path)),
                                             ),
                                           ),
-                                          const Positioned(
-                                              right: 60,
-                                              top: 70,
-                                              child: Icon(Icons.add_photo_alternate_outlined, color: Colors.white,))
+                                          /*IconButton(
+                                            onPressed: (){setState(() {
+                                              _pickedImage4 = null;
+                                            });},
+                                            icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))*/
                                         ],
                                       ),
                                     ),
-                                  ) else Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(21),
-                                        child: GestureDetector(
-                                          onTap: galeriaPicker2,
-                                          child: Image.file(File(_pickedImage2!.path)),
+                                ] else ...[
+                                  if (_pickedImage1 == null)
+                                    GestureDetector(
+                                      onTap: galeriaPicker1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                borderRadius:
+                                                    BorderRadius.circular(21),
+                                              ),
+                                            ),
+                                            const Positioned(
+                                                right: 60,
+                                                top: 70,
+                                                child: Icon(
+                                                  Icons
+                                                      .add_photo_alternate_outlined,
+                                                  color: Colors.white,
+                                                ))
+                                          ],
                                         ),
                                       ),
-                                      IconButton(
-                                          onPressed: (){
-                                            setState(() {
-                                              _pickedImage2 = null;
-                                            });},
-                                          icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))
-                                    ],
-                                  ),
-                                ),
-                                if (_pickedImage3 == null) GestureDetector(
-                                  onTap: galeriaPicker3,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Stack(
-                                      children:[
-                                        Container(
-                                          width: 150,
-                                          decoration: BoxDecoration(
-                                            color: Colors.black54,
-                                            borderRadius: BorderRadius.circular(21),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(21),
+                                            child: GestureDetector(
+                                              onTap: galeriaPicker1,
+                                              child: Image.file(
+                                                  File(_pickedImage1!.path)),
+                                            ),
                                           ),
-                                        ),
-                                        const Positioned(
-                                            right: 60,
-                                            top: 70,
-                                            child: Icon(Icons.add_photo_alternate_outlined, color: Colors.white,))
-                                      ],
+                                          IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _pickedImage1 = null;
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.remove_circle_rounded,
+                                                color: Colors.red,
+                                                size: 30,
+                                              ))
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ) else Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(21),
-                                        child: GestureDetector(
-                                          onTap: galeriaPicker3,
-                                          child: Image.file(File(_pickedImage3!.path)),
+                                  if (_pickedImage2 == null)
+                                    GestureDetector(
+                                      onTap: galeriaPicker2,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                borderRadius:
+                                                    BorderRadius.circular(21),
+                                              ),
+                                            ),
+                                            const Positioned(
+                                                right: 60,
+                                                top: 70,
+                                                child: Icon(
+                                                  Icons
+                                                      .add_photo_alternate_outlined,
+                                                  color: Colors.white,
+                                                ))
+                                          ],
                                         ),
                                       ),
-                                      IconButton(
-                                          onPressed: (){setState(() {
-                                            _pickedImage3 = null;
-                                          });},
-                                          icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))
-                                    ],
-                                  ),
-                                ),
-                                if (_pickedImage4 == null) GestureDetector(
-                                  onTap: galeriaPicker4,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Stack(
-                                      children:[
-                                        Container(
-                                          width: 150,
-                                          decoration: BoxDecoration(
-                                            color: Colors.black54,
-                                            borderRadius: BorderRadius.circular(21),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(21),
+                                            child: GestureDetector(
+                                              onTap: galeriaPicker2,
+                                              child: Image.file(
+                                                  File(_pickedImage2!.path)),
+                                            ),
                                           ),
-                                        ),
-                                        const Positioned(
-                                            right: 60,
-                                            top: 70,
-                                            child: Icon(Icons.add_photo_alternate_outlined, color: Colors.white,))
-                                      ],
+                                          IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _pickedImage2 = null;
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.remove_circle_rounded,
+                                                color: Colors.red,
+                                                size: 30,
+                                              ))
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ) else Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(21),
-                                        child: GestureDetector(
-                                          onTap: galeriaPicker4,
-                                          child: Image.file(File(_pickedImage4!.path)),
+                                  if (_pickedImage3 == null)
+                                    GestureDetector(
+                                      onTap: galeriaPicker3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                borderRadius:
+                                                    BorderRadius.circular(21),
+                                              ),
+                                            ),
+                                            const Positioned(
+                                                right: 60,
+                                                top: 70,
+                                                child: Icon(
+                                                  Icons
+                                                      .add_photo_alternate_outlined,
+                                                  color: Colors.white,
+                                                ))
+                                          ],
                                         ),
                                       ),
-                                      IconButton(
-                                          onPressed: (){setState(() {
-                                            _pickedImage4 = null;
-                                          });},
-                                          icon: const Icon(Icons.remove_circle_rounded, color: Colors.red, size: 30,))
-                                    ],
-                                  ),
-                                ),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(21),
+                                            child: GestureDetector(
+                                              onTap: galeriaPicker3,
+                                              child: Image.file(
+                                                  File(_pickedImage3!.path)),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _pickedImage3 = null;
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.remove_circle_rounded,
+                                                color: Colors.red,
+                                                size: 30,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
+                                  if (_pickedImage4 == null)
+                                    GestureDetector(
+                                      onTap: galeriaPicker4,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                borderRadius:
+                                                    BorderRadius.circular(21),
+                                              ),
+                                            ),
+                                            const Positioned(
+                                                right: 60,
+                                                top: 70,
+                                                child: Icon(
+                                                  Icons
+                                                      .add_photo_alternate_outlined,
+                                                  color: Colors.white,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(21),
+                                            child: GestureDetector(
+                                              onTap: galeriaPicker4,
+                                              child: Image.file(
+                                                  File(_pickedImage4!.path)),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _pickedImage4 = null;
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.remove_circle_rounded,
+                                                color: Colors.red,
+                                                size: 30,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
+                                ],
                               ],
-    ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10,),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             GestureDetector(
-                                onTap: (){
-                                  showDialog(context: (context), builder: (context){
-                                    return const AlertDialog(
-                                      title: Text('Asegúrate de usar palabras claves que mejoren el alcance de tu artículo.', style: TextStyle(fontSize: 15),),
-                                    );
-                                  });
+                                onTap: () {
+                                  showDialog(
+                                      context: (context),
+                                      builder: (context) {
+                                        return const AlertDialog(
+                                          title: Text(
+                                            'Asegúrate de usar palabras claves que mejoren el alcance de tu artículo.',
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                        );
+                                      });
                                 },
-                                child: const Icon(Icons.info_rounded, color: Colors.white, size: 30,)),
+                                child: const Icon(
+                                  Icons.info_rounded,
+                                  color: Colors.white,
+                                  size: 30,
+                                )),
                           ],
                         ),
-                        const SizedBox(height: 10,),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         SizedBox(
                           width: 400,
                           child: TextFormField(
@@ -646,23 +786,22 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                               keyboardType: TextInputType.multiline,
                               decoration: InputDecoration(
                                   contentPadding: const EdgeInsets.all(10),
-                                  hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
+                                  hintStyle: const TextStyle(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.normal),
                                   hintText: 'Nombra tu artículo',
                                   filled: true,
                                   fillColor: Colors.white,
                                   border: OutlineInputBorder(
                                       borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.circular(25)
-                                  )
-                              ),
-                              validator: (value){
-                                if(value!.isEmpty){
+                                      borderRadius: BorderRadius.circular(25))),
+                              validator: (value) {
+                                if (value!.isEmpty) {
                                   return "Ingresa el nombre tu artículo.";
-                                }else{
+                                } else {
                                   null;
                                 }
-                              }
-                          ),
+                              }),
                         ),
                         const Divider(),
                         Row(
@@ -672,14 +811,15 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                               child: DropdownButtonFormField(
                                   decoration: InputDecoration(
                                       contentPadding: const EdgeInsets.all(10),
-                                      hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
+                                      hintStyle: const TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.normal),
                                       filled: true,
                                       fillColor: Colors.white,
                                       border: OutlineInputBorder(
                                           borderSide: BorderSide.none,
-                                          borderRadius: BorderRadius.circular(25)
-                                      )
-                                  ),
+                                          borderRadius:
+                                              BorderRadius.circular(25))),
                                   dropdownColor: Colors.white,
                                   borderRadius: BorderRadius.circular(25),
                                   items: stateDropDownList,
@@ -691,32 +831,37 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                                     });
                                   }),
                             ),
-                            const SizedBox(width: 40,),
+                            const SizedBox(
+                              width: 40,
+                            ),
                             SizedBox(
                               width: 150,
                               child: TextFormField(
                                   controller: _priceController,
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
                                   decoration: InputDecoration(
-                                      prefixIcon: const Icon(Icons.attach_money_rounded),
+                                      prefixIcon: const Icon(
+                                          Icons.attach_money_rounded),
                                       contentPadding: const EdgeInsets.all(10),
-                                      hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
+                                      hintStyle: const TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.normal),
                                       hintText: 'Precio',
                                       filled: true,
                                       fillColor: Colors.white,
                                       border: OutlineInputBorder(
                                           borderSide: BorderSide.none,
-                                          borderRadius: BorderRadius.circular(25)
-                                      )
-                                  ),
-                                  validator: (value){
-                                    if(value!.isEmpty){
+                                          borderRadius:
+                                              BorderRadius.circular(25))),
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
                                       return "Ingresa el precio.";
-                                    }else{
+                                    } else {
                                       null;
                                     }
-                                  }
-                              ),
+                                  }),
                             ),
                           ],
                         ),
@@ -752,14 +897,14 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                         DropdownButtonFormField(
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.all(20),
-                                hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
+                                hintStyle: const TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.normal),
                                 filled: true,
                                 fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                     borderSide: BorderSide.none,
-                                    borderRadius: BorderRadius.circular(25)
-                                )
-                            ),
+                                    borderRadius: BorderRadius.circular(25))),
                             dropdownColor: Colors.white,
                             borderRadius: BorderRadius.circular(25),
                             items: categoriesDropDownList,
@@ -782,23 +927,22 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                               keyboardType: TextInputType.multiline,
                               decoration: InputDecoration(
                                   contentPadding: const EdgeInsets.all(20),
-                                  hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
+                                  hintStyle: const TextStyle(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.normal),
                                   hintText: 'Descripción',
                                   filled: true,
                                   fillColor: Colors.white,
                                   border: OutlineInputBorder(
                                       borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.circular(25)
-                                  )
-                              ),
-                              validator: (value){
-                                if(value!.isEmpty){
+                                      borderRadius: BorderRadius.circular(25))),
+                              validator: (value) {
+                                if (value!.isEmpty) {
                                   return "Ingresa la descripción de tu artículo.";
-                                }else{
+                                } else {
                                   null;
                                 }
-                              }
-                          ),
+                              }),
                         ),
                       ],
                     ),
@@ -806,76 +950,91 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: CustomButton(
                   onTap: () async {
-
-                    if ((_pickedImage1 == null) && isEditing == false){
-                      showDialog(context: context, builder: (context){
-                        return const AlertDialog(
-                          title: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Asegúrate de elegir al menos una imagen de tu artículo'),
-                            ],
-                          ),
-                        );
-                      });
+                    if ((_pickedImage1 == null) && isEditing == false) {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const AlertDialog(
+                              title: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      'Asegúrate de elegir al menos una imagen de tu artículo'),
+                                ],
+                              ),
+                            );
+                          });
                       return;
                     }
 
-                    if (_stateValue != 'Nuevo' && _stateValue!='Usado'){
-                      showDialog(context: context, builder: (context){
-                        return const AlertDialog(
-                          title: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('¿Tu artículo es nuevo o usado?'),
-                            ],
-                          ),
-                        );
-                      });
+                    if (_stateValue != 'Nuevo' && _stateValue != 'Usado') {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const AlertDialog(
+                              title: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('¿Tu artículo es nuevo o usado?'),
+                                ],
+                              ),
+                            );
+                          });
                       return;
                     }
 
-                    if (_categoryValue == null){
-                      showDialog(context: context, builder: (context){
-                        return const AlertDialog(
-                          title: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Selecciona una categoría para tu artículo'),
-                            ],
-                          ),
-                        );
-                      });
+                    if (_categoryValue == null) {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const AlertDialog(
+                              title: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      'Selecciona una categoría para tu artículo'),
+                                ],
+                              ),
+                            );
+                          });
                       return;
                     }
 
-                    if(isEditing == true){
-                      showDialog(context: context, builder: (context){
-                        return const Center(
-                            child: CircularProgressIndicator(
+                    if (isEditing == true) {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const Center(
+                                child: CircularProgressIndicator(
                               color: Colors.deepPurple,
                             ));
-                      });
+                          });
 
                       try {
                         setState(() {
                           isLoading = true;
                         });
 
-
                         UserModel? userModel;
                         User? user = FirebaseAuth.instance.currentUser;
+                        var userMap = {};
 
                         /// FETCHING DE DATOS DEL USUARIO
-                        try{
-                          final userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
-
-                          final userDocDict = userDoc.data() as Map<String, dynamic>?;
+                        try {
+                          final userDoc = await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user!.uid)
+                              .get();
+                          userMap = userDoc.data()!;
+                          final userDocDict =
+                              userDoc.data() as Map<String, dynamic>?;
 
                           userModel = UserModel(
                             userId: userDoc.get('userId'),
@@ -888,16 +1047,23 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                             userEmail: userDoc.get('userEmail'),
                             createdAt: userDoc.get('createdAt'),
                             points: userDoc.get('points'),
-                            userWish: userDocDict!.containsKey("userWish") ? userDoc.get("userWish") : [],);
-                        } on FirebaseException catch(e){
+                            userWish: userDocDict!.containsKey("userWish")
+                                ? userDoc.get("userWish")
+                                : [],
+                          );
+                        } on FirebaseException catch (e) {
                           rethrow;
-                        }catch(e){
+                        } catch (e) {
                           rethrow;
                         }
+
                         /// /// /// /// /// /// /// ///
 
-
-                        await FirebaseFirestore.instance.collection("products").doc('${_titleController.text} ID:${widget.productModel!.productId}').update({
+                        await FirebaseFirestore.instance
+                            .collection("products")
+                            .doc(
+                                '${_titleController.text} ID:${widget.productModel!.productId}')
+                            .update({
                           'productTitle': _titleController.text,
                           'productPrice': '${_priceController.text}',
                           'productCategory': _categoryValue,
@@ -905,21 +1071,29 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                           'productDescription': _descriptionController.text,
                         });
 
-                        Navigator.of(context).pop(MaterialPageRoute(builder: (context){
+                        Navigator.of(context)
+                            .pop(MaterialPageRoute(builder: (context) {
                           return const SearchPage();
                         }));
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              duration: Duration(seconds: 3),
-                              elevation: 10,
-                              content: Center(
-                                child: Text('Artículo editado... En breve serán publicados los cambios.',
-                                  style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 15),),
-                              ),
-                              backgroundColor: Colors.white,));
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          duration: Duration(seconds: 3),
+                          elevation: 10,
+                          content: Center(
+                            child: Text(
+                              'Artículo editado... En breve serán publicados los cambios.',
+                              style: TextStyle(
+                                  color: Colors.deepPurple,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ),
+                          backgroundColor: Colors.white,
+                        ));
                         if (!mounted) return;
-                        Navigator.of(context).pop(MaterialPageRoute(builder: (context){
+                        Navigator.of(context)
+                            .pop(MaterialPageRoute(builder: (context) {
                           return const SearchPage();
                         }));
                       } catch (e) {
@@ -928,49 +1102,71 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                         isLoading = false;
                       }
 
-                      if (_pickedImage1 == null){
+                      if (_pickedImage1 == null) {
                         print('null');
                       }
                     } else if (formKey.currentState!.validate()) {
-
-                      showDialog(context: context, builder: (context){
-                        return const Center(
-                            child: CircularProgressIndicator(
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const Center(
+                                child: CircularProgressIndicator(
                               color: Colors.deepPurple,
                             ));
-                      });
+                          });
 
                       try {
-
                         setState(() {
                           isLoading = true;
                         });
 
-                        final ref1 = FirebaseStorage.instance.ref().child('productsImages').child('1${_titleController.text.trim()}.jpg');
+                        final ref1 = FirebaseStorage.instance
+                            .ref()
+                            .child('productsImages')
+                            .child('1${_titleController.text.trim()}.jpg');
                         await ref1.putFile(File(_pickedImage1!.path));
                         productImageUrl1 = await ref1.getDownloadURL();
 
-                        final ref2 = FirebaseStorage.instance.ref().child('productsImages').child('2${_titleController.text.trim()}.jpg');
-                        _pickedImage2 == null ? await ref2.putFile(File(_pickedImage1!.path)):await ref2.putFile(File(_pickedImage2!.path));
+                        final ref2 = FirebaseStorage.instance
+                            .ref()
+                            .child('productsImages')
+                            .child('2${_titleController.text.trim()}.jpg');
+                        _pickedImage2 == null
+                            ? await ref2.putFile(File(_pickedImage1!.path))
+                            : await ref2.putFile(File(_pickedImage2!.path));
                         productImageUrl2 = await ref2.getDownloadURL();
 
-                        final ref3 = FirebaseStorage.instance.ref().child('productsImages').child('3${_titleController.text.trim()}.jpg');
-                        _pickedImage3 == null ? await ref3.putFile(File(_pickedImage1!.path)):await ref3.putFile(File(_pickedImage3!.path));
+                        final ref3 = FirebaseStorage.instance
+                            .ref()
+                            .child('productsImages')
+                            .child('3${_titleController.text.trim()}.jpg');
+                        _pickedImage3 == null
+                            ? await ref3.putFile(File(_pickedImage1!.path))
+                            : await ref3.putFile(File(_pickedImage3!.path));
                         productImageUrl3 = await ref3.getDownloadURL();
 
-                        final ref4 = FirebaseStorage.instance.ref().child('productsImages').child('${_titleController.text.trim()}.jpg');
-                        _pickedImage4 == null ? await ref4.putFile(File(_pickedImage1!.path)):await ref4.putFile(File(_pickedImage4!.path));
+                        final ref4 = FirebaseStorage.instance
+                            .ref()
+                            .child('productsImages')
+                            .child('${_titleController.text.trim()}.jpg');
+                        _pickedImage4 == null
+                            ? await ref4.putFile(File(_pickedImage1!.path))
+                            : await ref4.putFile(File(_pickedImage4!.path));
                         productImageUrl4 = await ref4.getDownloadURL();
-
 
                         UserModel? userModel;
                         User? user = FirebaseAuth.instance.currentUser;
+                        var userMap = {};
 
                         /// FETCHING DE DATOS DEL USUARIO
-                        try{
-                          final userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
-
-                          final userDocDict = userDoc.data() as Map<String, dynamic>?;
+                        try {
+                          final userDoc = await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user!.uid)
+                              .get();
+                          var userMap = userDoc.data()!;
+                          final userDocDict =
+                              userDoc.data() as Map<String, dynamic>?;
 
                           userModel = UserModel(
                             userId: userDoc.get('userId'),
@@ -983,16 +1179,20 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                             userEmail: userDoc.get('userEmail'),
                             createdAt: userDoc.get('createdAt'),
                             points: userDoc.get('points'),
-                            userWish: userDocDict!.containsKey("userWish") ? userDoc.get("userWish") : [],);
-                        } on FirebaseException catch(e){
+                            userWish: userDocDict!.containsKey("userWish")
+                                ? userDoc.get("userWish")
+                                : [],
+                          );
+                        } on FirebaseException catch (e) {
                           rethrow;
-                        }catch(e){
+                        } catch (e) {
                           rethrow;
                         }
+
                         /// /// /// /// /// /// /// ///
 
                         final productId = const Uuid().v4();
-                        await FirebaseFirestore.instance.collection("products").doc('${_titleController.text} ID:$productId').set({
+                        var body = {
                           'productId': productId,
                           'userId': user.uid,
                           'userEmail': user.email,
@@ -1001,7 +1201,7 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                           'userLocation': userModel.location,
                           'userImage': user.photoURL,
                           'productTitle': _titleController.text,
-                          'productPrice': '${_priceController.text}',
+                          'productPrice': _priceController.text,
                           'productImage1': productImageUrl1,
                           'productImage2': productImageUrl2,
                           'productImage3': productImageUrl3,
@@ -1012,12 +1212,30 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                           'productDescription': _descriptionController.text,
                           'createdAt': Timestamp.now(),
                           'publicar': false,
-                          'servicio':false,
+                          'servicio': false,
                           'vendido': false,
                           'calificado': false,
-                        });
+                        };
 
-                        await FirebaseFirestore.instance.collection("products").doc('${_titleController.text} ID:$productId').collection('preguntas').add({});
+                        await FirebaseFirestore.instance
+                            .collection("products")
+                            .doc('${_titleController.text} ID:$productId')
+                            .set(body);
+
+                        await FirebaseFirestore.instance
+                            .collection("products")
+                            .doc('${_titleController.text} ID:$productId')
+                            .collection('preguntas')
+                            .add({});
+
+                        var userId = user.uid;
+                        List userPosts = userMap['userPosts'] ?? [];
+                        userPosts.add(body);
+                        userMap['userPosts'] = userPosts;
+                        await FirebaseFirestore.instance
+                            .collection("users")
+                            .doc(userId)
+                            .update({"userPosts": userPosts});
 
                         try {
                           await publishProvider.addToUserPublishListFirebase(
@@ -1026,26 +1244,31 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                           );
                           await publishProvider.fetchUserPublishlist();
                         } catch (e) {
+                        } finally {}
 
-                        } finally {
-
-                        }
-
-                        Navigator.of(context).pop(MaterialPageRoute(builder: (context){
+                        Navigator.of(context)
+                            .pop(MaterialPageRoute(builder: (context) {
                           return const SearchPage();
                         }));
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              duration: Duration(seconds: 3),
-                              elevation: 10,
-                              content: Center(
-                                child: Text('Artículo en revisión... En breve será publicado.',
-                                  style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold, fontSize: 15),),
-                              ),
-                              backgroundColor: Colors.white,));
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          duration: Duration(seconds: 3),
+                          elevation: 10,
+                          content: Center(
+                            child: Text(
+                              'Artículo en revisión... En breve será publicado.',
+                              style: TextStyle(
+                                  color: Colors.deepPurple,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ),
+                          backgroundColor: Colors.white,
+                        ));
                         if (!mounted) return;
-                        Navigator.of(context).pop(MaterialPageRoute(builder: (context){
+                        Navigator.of(context)
+                            .pop(MaterialPageRoute(builder: (context) {
                           return const SearchPage();
                         }));
                       } catch (e) {
@@ -1056,22 +1279,27 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                     } else {
                       if (formKey.currentState!.validate()) {
                         if (_pickedImage1 == null) {
-                          await showDialog(context: context,
+                          await showDialog(
+                              context: context,
                               builder: (context) {
                                 return AlertDialog(
                                   title: Column(
                                     children: [
-                                      const Text('Selecciona al menos una imagen'),
+                                      const Text(
+                                          'Selecciona al menos una imagen'),
                                       Row(
                                         children: [
                                           TextButton(
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text('Entendido',
-                                                style: TextStyle(fontSize: 20,
-                                                    fontWeight: FontWeight
-                                                        .bold),)),
+                                              child: const Text(
+                                                'Entendido',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
                                         ],
                                       )
                                     ],
@@ -1082,8 +1310,8 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                         }
                         Navigator.pop(context,
                             MaterialPageRoute(builder: (context) {
-                              return const EditOrUploadProductScreen();
-                            }));
+                          return const EditOrUploadProductScreen();
+                        }));
                       }
                     }
                   },
@@ -1091,7 +1319,7 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                   width: 300,
                   color: Colors.white,
                   radius: 50,
-                  text: isEditing ? 'Guardar cambios':'Publicar',
+                  text: isEditing ? 'Guardar cambios' : 'Publicar',
                   fontSize: 20,
                   textColor: Colors.deepPurple,
                   shadow: 8,
