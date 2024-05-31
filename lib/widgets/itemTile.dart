@@ -95,9 +95,27 @@ class itemTile extends StatelessWidget {
                                     shape: BoxShape.circle,
                                   ),
                                   child: IconButton(
+
                                       onPressed: () async {
-                                        shareLink(productsModel.productId.toString().trim());
+
+                                        String routeName = ProductDetails.routeName.toString().trim();
+                                        var body = {"routeName": routeName, "productId": productsModel.productId};
+                                        var encodedStr = jsonEncode(body);
+                                        String base64Encoded = base64Encode(utf8.encode(encodedStr));
+
+                                        var link = await DynamicLinkProvider().createLink(base64Encoded);
+
+                                        Share.share("¡No te pierdas esta oferta de *${productsModel.productTitle}* a *\$${productsModel.productPrice}*, Solo en *Rimio* ${link.toString()}");
+
+                                        // await Share.share(
+                                        // '${productsModel.productImage1}\n¡No te pierdas esta oferta de *${productsModel.productTitle}* a *\$${productsModel.productPrice}*, Solo en *Rimio*, '
+                                        // '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
+
+                                        // await shareToWhatsApp(
+                                        //   '¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, ¡Descarga la App YA!',
+                                        //     getCurrentProduct.productImage1);
                                       },
+
                                       icon: const Icon(Icons.share))),
                             ],
                           ),
@@ -209,21 +227,22 @@ class itemTile extends StatelessWidget {
 
 
 }
-void shareLink(productId) async {
-  String routeName = ProductDetails.routeName.toString().trim();
-  var body = {"routeName": routeName, "productId": productId};
-  var encodedStr = jsonEncode(body);
-  String base64Encoded = base64Encode(utf8.encode(encodedStr));
 
-  var link = await DynamicLinkProvider().createLink(base64Encoded);
-
-  Share.share("this is the link ${link.toString()}");
-
-  // await Share.share(
-  // '${productsModel.productImage1}\n¡No te pierdas esta oferta de *${productsModel.productTitle}* a *\$${productsModel.productPrice}*, Solo en *Rimio*, '
-  // '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
-
-  // await shareToWhatsApp(
-  //   '¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, ¡Descarga la App YA!',
-  //     getCurrentProduct.productImage1);
-}
+// void shareLink(productId) async {
+//   String routeName = ProductDetails.routeName.toString().trim();
+//   var body = {"routeName": routeName, "productId": productId};
+//   var encodedStr = jsonEncode(body);
+//   String base64Encoded = base64Encode(utf8.encode(encodedStr));
+//
+//   var link = await DynamicLinkProvider().createLink(base64Encoded);
+//
+//   Share.share("this is the link ${link.toString()}");
+//
+//   // await Share.share(
+//   // '${productsModel.productImage1}\n¡No te pierdas esta oferta de *${productsModel.productTitle}* a *\$${productsModel.productPrice}*, Solo en *Rimio*, '
+//   // '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
+//
+//   // await shareToWhatsApp(
+//   //   '¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, ¡Descarga la App YA!',
+//   //     getCurrentProduct.productImage1);
+// }

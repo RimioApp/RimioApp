@@ -54,14 +54,11 @@ class ProductDetails extends StatefulWidget {
 
 class _ProductDetailsState extends State<ProductDetails> {
   List<CategoriaModel> categoriaLista = [
-    CategoriaModel(
-        id: 'Guitarra', name: 'Guitarra', image: 'assets/guitarra.png'),
+    CategoriaModel(id: 'Guitarra', name: 'Guitarra', image: 'assets/guitarra.png'),
     CategoriaModel(id: 'Bateria', name: 'Bateria', image: 'assets/bateria.png'),
     CategoriaModel(id: 'Teclado', name: 'Teclado', image: 'assets/teclado.png'),
-    CategoriaModel(
-        id: 'Folklore', name: 'Folklore', image: 'assets/tradicional.png'),
-    CategoriaModel(
-        id: 'Orquesta', name: 'Orquesta', image: 'assets/orquesta.png'),
+    CategoriaModel(id: 'Folklore', name: 'Folklore', image: 'assets/tradicional.png'),
+    CategoriaModel(id: 'Orquesta', name: 'Orquesta', image: 'assets/orquesta.png'),
     CategoriaModel(id: 'Dj', name: 'Dj', image: 'assets/dj.png'),
     CategoriaModel(id: 'Aire', name: 'Aire', image: 'assets/aire.png'),
     CategoriaModel(id: 'Estudio', name: 'Estudio', image: 'assets/estudio.png'),
@@ -190,9 +187,9 @@ class _ProductDetailsState extends State<ProductDetails> {
       required String subject,
       required String message,
     }) async {
-      final serviceId = 'service_3v0pszg';
-      final templateId = 'template_53tf042';
-      final userId = 'oeIkDnH7heER4ZUR9';
+      const serviceId = 'service_3v0pszg';
+      const templateId = 'template_53tf042';
+      const userId = 'oeIkDnH7heER4ZUR9';
 
       final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
       final response = await http.post(url,
@@ -725,7 +722,23 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     ),
                                     child: IconButton(
                                         onPressed: () async {
-                                          shareLink(getCurrentProduct.productId);
+
+                                          String routeName = ProductDetails.routeName.toString().trim();
+                                          var body = {"routeName": routeName, "productId": getCurrentProduct.productId};
+                                          var encodedStr = jsonEncode(body);
+                                          String base64Encoded = base64Encode(utf8.encode(encodedStr));
+
+                                          var link = await DynamicLinkProvider().createLink(base64Encoded);
+
+                                          Share.share("¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio* ${link.toString()}");
+
+                                          // await Share.share(
+                                          // '${productsModel.productImage1}\n¡No te pierdas esta oferta de *${productsModel.productTitle}* a *\$${productsModel.productPrice}*, Solo en *Rimio*, '
+                                          // '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
+
+                                          // await shareToWhatsApp(
+                                          //   '¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, ¡Descarga la App YA!',
+                                          //     getCurrentProduct.productImage1);
                                         },
                                         icon: const Icon(Icons.share))),
                               ],
@@ -1384,12 +1397,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                             if (fcmToken == null) return;
 
                             var notification = {
-                              "title": "Nouvelle Message",
-                              "body": "$fullName a répondu à votre message",
+                              "title": "Nuevo Mensaje",
+                              "body": "$fullName respondió tu mensaje",
                             };
                             var data = {
-                              "title": "Nouvelle Message",
-                              "body": "$fullName a répondu à votre message",
+                              "title": "Nuevo Mensaje",
+                              "body": "$fullName respondió tu mensaje",
                               'productId': "productId",
                               "type": "reply"
                             };
@@ -1424,73 +1437,6 @@ class _ProductDetailsState extends State<ProductDetails> {
     phoneNumber,
     whatsappNumber,
   ) async {
-    /// FETCHING DE DATOS DEL USUARIO
-    try {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
-
-      final userDocDict = userDoc.data();
-
-      String status = userDoc.data()!['profile_status'];
-
-      if (status == "pending") {
-        String message =
-            'Tu perfil no está verificado, por favor contacta con el administrador.';
-        disDialog(message);
-        return;
-      }
-
-      userModel = UserModel(
-        userId: userDoc.get('userId'),
-        userName: userDoc.get('userName'),
-        userLastName: userDoc.get('userLastName'),
-        displayName: userDoc.get('displayName'),
-        phone: userDoc.get('phone'),
-        location: userDoc.get('location'),
-        userImage: userDoc.get('userImage'),
-        userEmail: userDoc.get('userEmail'),
-        createdAt: userDoc.get('createdAt'),
-        points: userDoc.get('points'),
-        userWish:
-            userDocDict!.containsKey("userWish") ? userDoc.get("userWish") : [],
-      );
-
-      var userId = getCurrentProduct.userId;
-      // var userId = FirebaseAuth.instance.currentUser!.uid;
-      var userDocData = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .get();
-
-      if (userDocData.data() != null) {
-        var userName = userDocData.data()!['userName'];
-        var userLastName = userDocData.data()!['userLastName'];
-
-        String fullName = "$userName $userLastName";
-        var fcmToken = userDocData.data()!['fcm_token'];
-        if (fcmToken == null) return;
-        var notification = {
-          "title": "Nouvelle Message",
-          "body": "$fullName a acheté votre article",
-        };
-        var data = {
-          "title": "Nouvelle Message",
-          "body": "$fullName a acheté votre article",
-          'productId': "productId",
-          "type": "reply"
-        };
-        NotificationCallService()
-            .sendNotification(notification, data, fcmToken);
-      }
-    } on FirebaseException catch (e) {
-      rethrow;
-    } catch (e) {
-      rethrow;
-    }
-
-    /// /// /// /// /// /// /// ///
 
     showDialog(
         context: context,
@@ -1618,6 +1564,72 @@ class _ProductDetailsState extends State<ProductDetails> {
                             controller.loading(); //starts loading animation
                             await Future.delayed(const Duration(seconds: 3));
                             controller.success();
+
+                            /// FETCHING DE DATOS DEL USUARIO
+                            try {
+                              final userDoc = await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(user!.uid)
+                                  .get();
+
+                              final userDocDict = userDoc.data();
+
+                              String status = userDoc.data()!['profile_status'];
+
+                              if (status == "pending") {
+                                String message =
+                                    'Tu perfil no está verificado, por favor contacta al administrador.';
+                                disDialog(message);
+                                return;
+                              }
+
+                              userModel = UserModel(
+                                userId: userDoc.get('userId'),
+                                userName: userDoc.get('userName'),
+                                userLastName: userDoc.get('userLastName'),
+                                displayName: userDoc.get('displayName'),
+                                phone: userDoc.get('phone'),
+                                location: userDoc.get('location'),
+                                userImage: userDoc.get('userImage'),
+                                userEmail: userDoc.get('userEmail'),
+                                createdAt: userDoc.get('createdAt'),
+                                points: userDoc.get('points'),
+                                userWish:
+                                userDocDict!.containsKey("userWish") ? userDoc.get("userWish") : [],
+                              );
+
+                              var userId = getCurrentProduct.userId;
+                              // var userId = FirebaseAuth.instance.currentUser!.uid;
+                              var userDocData = await FirebaseFirestore.instance
+                                  .collection("users")
+                                  .doc(userId)
+                                  .get();
+
+                              if (userDocData.data() != null) {
+                                var userName = userDocData.data()!['userName'];
+                                var userLastName = userDocData.data()!['userLastName'];
+
+                                String fullName = "$userName $userLastName";
+                                var fcmToken = userDocData.data()!['fcm_token'];
+                                if (fcmToken == null) return;
+                                var notification = {
+                                  "title": "Nuevo Mensaje",
+                                  "body": "$fullName acaba de ofertar}",
+                                };
+                                var data = {
+                                  "title": "Nuevo Mensaje",
+                                  "body": "$fullName acaba de ofertar",
+                                  'productId': "productId",
+                                  "type": "reply"
+                                };
+                                NotificationCallService()
+                                    .sendNotification(notification, data, fcmToken);
+                              }
+                            } on FirebaseException catch (e) {
+                              rethrow;
+                            } catch (e) {
+                              rethrow;
+                            }
 
                             try {
                               await orderProvider.addToUserOrdersListFirebase(
@@ -1856,7 +1868,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             Navigator.pop(context);
                           },
                           child: const Text(
-                            "Okay",
+                            "Entendido",
                             style: TextStyle(color: Colors.deepPurple),
                           ),
                         ),
@@ -1925,12 +1937,12 @@ class _ProductDetailsState extends State<ProductDetails> {
             var fcmToken = userDoc.data()!['fcm_token'];
             if (fcmToken == null) return;
             var notification = {
-              "title": "Nouvelle Message",
-              "body": "$fullName vous a envoyé un message",
+              "title": "Nuevo Mensaje",
+              "body": "$fullName te ha enviado un mensaje",
             };
             var data = {
-              "title": "Nouvelle Message",
-              "body": "$fullName vous a envoyé un message",
+              "title": "Nuevo Mensaje",
+              "body": "$fullName te ha enviado un mensaje",
               'productId': "productId",
               "type": "new_message"
             };

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:Rimio/providers/product_provider.dart';
 import 'package:Rimio/providers/vistoReciente_provider.dart';
 import 'package:Rimio/view/productDetails.dart';
 import 'package:Rimio/widgets/customButton.dart';
+import 'package:Rimio/widgets/dynamic_link.dart';
 import 'package:Rimio/widgets/fav_button.dart';
 import 'package:Rimio/widgets/itemTile.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
@@ -94,15 +97,23 @@ class _ProductWidgetState extends State<ProductWidget> {
                                 ),
                                 child: IconButton(
                                     onPressed: () async {
+
+                                      String routeName = ProductDetails.routeName.toString().trim();
+                                      var body = {"routeName": routeName, "productId": getCurrentProduct.productId};
+                                      var encodedStr = jsonEncode(body);
+                                      String base64Encoded = base64Encode(utf8.encode(encodedStr));
+
+                                      var link = await DynamicLinkProvider().createLink(base64Encoded);
+
+                                      Share.share("¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio* ${link.toString()}");
+
                                       // await Share.share(
-                                      //     '${getCurrentProduct.productImage1}\n¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, '
-                                      //     '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
+                                      // '${productsModel.productImage1}\n¡No te pierdas esta oferta de *${productsModel.productTitle}* a *\$${productsModel.productPrice}*, Solo en *Rimio*, '
+                                      // '¡Descarga la App YA! o ingresa al siguiente enlace https://rimiosite.web.app');
 
                                       // await shareToWhatsApp(
                                       //   '¡No te pierdas esta oferta de *${getCurrentProduct.productTitle}* a *\$${getCurrentProduct.productPrice}*, Solo en *Rimio*, ¡Descarga la App YA!',
                                       //     getCurrentProduct.productImage1);
-
-                                      shareLink(getCurrentProduct.productId);
                                     },
                                     icon: const Icon(Icons.share))),
                           ],
