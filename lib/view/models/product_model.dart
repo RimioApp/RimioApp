@@ -13,6 +13,7 @@ class ProductModel with ChangeNotifier{
       productTitle,
       productPrice,
       productCategory,
+      productQty,
       productState,
       productDescription,
       productImage1;
@@ -38,6 +39,7 @@ class ProductModel with ChangeNotifier{
     required this.userPoints,
     required this.productTitle,
     required this.productPrice,
+    required this.productQty,
     required this.productCategory,
     required this.productState,
     required this.productDescription,
@@ -66,6 +68,7 @@ class ProductModel with ChangeNotifier{
       productTitle: data['productTitle'],
       productPrice: data['productPrice'],
       productCategory: data['productCategory'],
+      productQty: data['productQty'],
       productState: data['productState'],
       productDescription: data['productDescription'],
       productImage1: data['productImage1'],

@@ -25,6 +25,7 @@ import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -306,7 +307,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                         ),
                       ),
                     ),
-                  orderProvider.getUserOrders.containsKey(productId)
+                  (orderProvider.getUserOrders
+                      .containsKey(productId) && int.parse(getCurrentProduct.productQty) < 1)///TODO: cambiar condicion
                       ? Stack(children: [
                           FancyShimmerImage(
                               boxFit: BoxFit.contain,
@@ -891,9 +893,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              FavButton(
-                                productId: getCurrentProduct.productId,
-                                size: 40,
+                              Visibility(
+                                visible: getCurrentProduct.vendido == true ? false:true,
+                                child: FavButton(
+                                  productId: getCurrentProduct.productId,
+                                  size: 40,
+                                ),
                               ),
                               const SizedBox(
                                 height: 20,
@@ -929,9 +934,33 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
                                     height: 60,
-                                    child: orderProvider.getUserOrders
-                                            .containsKey(productId)
-                                        ? const SizedBox.shrink()
+                                    child: (orderProvider.getUserOrders
+                                            .containsKey(productId) && int.parse(getCurrentProduct.productQty) < 1)
+                                        ? Row(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: SizedBox(
+                                                  height: 60,
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      elevation: 3,
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                          BorderRadius.circular(12)),
+                                                      foregroundColor: Colors.white,
+                                                      backgroundColor: Colors.red,
+                                                    ),
+                                                    onPressed: () {},
+                                                    child: const Text(
+                                                      'Vendido',
+                                                      style: TextStyle(fontSize: 25),
+                                                    ),
+                                                  ))),
+                                        ),
+                                      ],
+                                    )
                                         : ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                                 elevation: 3,
@@ -968,8 +997,17 @@ class _ProductDetailsState extends State<ProductDetails> {
                               ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 10,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Visibility(
+                            visible: int.parse(getCurrentProduct.productQty) > 1 ? true:false,
+                            child: Text('¡${getCurrentProduct.productQty} Unidades disponibles!'),
+                          ),
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -1711,12 +1749,16 @@ class _ProductDetailsState extends State<ProductDetails> {
                               });
 
                               try {
+
+                                final productQty = int.parse(getCurrentProduct.productQty);
+
                                 await FirebaseFirestore.instance
                                     .collection("products")
                                     .doc(
                                         '${getCurrentProduct.productTitle} ID:${getCurrentProduct.productId}')
                                     .update({
-                                  'vendido': true,
+                                  'vendido': productQty == 0 ? true:false,
+                                  'productQty': (productQty - 1).toString(),
                                 });
                               } catch (e) {}
 

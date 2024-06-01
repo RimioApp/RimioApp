@@ -181,10 +181,18 @@ class _homeScreenState extends State<homeScreen> {
     _bannerAd.load();
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
+    
     final productProvider = Provider.of<ProductsProvider>(context);
     final vistoProvider = Provider.of<VistoRecienteProvider>(context);
+    
+    for (var url in bannerImages) {
+      precacheImage(NetworkImage(url),context);
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(

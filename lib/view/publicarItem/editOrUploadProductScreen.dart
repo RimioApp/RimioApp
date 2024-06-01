@@ -32,6 +32,7 @@ class EditOrUploadProductScreen extends StatefulWidget {
 class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
   late TextEditingController _titleController,
       _priceController,
+      _qtyController,
       _descriptionController;
 
   final formKey = GlobalKey<FormState>();
@@ -63,6 +64,7 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
     _priceController =
         TextEditingController(text: widget.productModel?.productPrice);
     _stateValue = widget.productModel?.productState;
+    _qtyController = TextEditingController(text: widget.productModel?.productQty);
     _descriptionController =
         TextEditingController(text: widget.productModel?.productDescription);
     _categoryValue = widget.productModel?.productCategory;
@@ -75,6 +77,7 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
     _titleController.dispose();
     _priceController.dispose();
     _descriptionController.dispose();
+    _qtyController.dispose();
     super.dispose();
   }
 
@@ -916,6 +919,46 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                               });
                             }),
                         const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Especifique la cantidad'),
+                              const SizedBox(
+                                width: 40,
+                              ),
+                              SizedBox(
+                                width: 150,
+                                child: TextFormField(
+                                    controller: _qtyController,
+                                    keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
+                                    decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.all(10),
+                                        hintStyle: const TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.normal),
+                                        hintText: 'Cantidad',
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.circular(25))),
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return "Ingresa la cantidad.";
+                                      } else {
+                                        null;
+                                      }
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(),
                         SizedBox(
                           width: 400,
                           child: TextFormField(
@@ -1069,6 +1112,7 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                           'productCategory': _categoryValue,
                           'productState': _stateValue,
                           'productDescription': _descriptionController.text,
+                          'productQty': _qtyController.text,
                         });
 
                         Navigator.of(context)
@@ -1207,6 +1251,7 @@ class _EditOrUploadProductScreenState extends State<EditOrUploadProductScreen> {
                           'productImage3': productImageUrl3,
                           'productImage4': productImageUrl4,
                           'productCategory': _categoryValue,
+                          'productQty': _qtyController.text,
                           'productState': _stateValue,
                           'userPoints': userModel.points,
                           'productDescription': _descriptionController.text,
