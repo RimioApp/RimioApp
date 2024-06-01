@@ -49,7 +49,16 @@ class _ProductWidgetState extends State<ProductWidget> {
     return getCurrentProduct!.publicar == false && !widget.isUserHistory
         ? const Padding(
             padding: EdgeInsets.all(50.0),
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: Column(
+              children: [
+                Text('A espera de aprobación'),
+                SizedBox(height: 15,),
+                SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator()),
+              ],
+            )),
           )
         : GestureDetector(
             onTap: () {

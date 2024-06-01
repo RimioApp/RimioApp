@@ -23,6 +23,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
@@ -1186,101 +1187,152 @@ class _ProductDetailsState extends State<ProductDetails> {
                             AsyncSnapshot<QuerySnapshot> snapshot) {
                           return snapshot.hasData
                               ? SizedBox(
-                                  height: 400,
+                                  height: 200,
                                   width: 550,
-                                  child: ListView(
-                                    children: snapshot.data!.docs
-                                        .map((DocumentSnapshot document) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Stack(children: [
-                                          Center(
-                                            child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(12),
-                                                width: 350,
-                                                height: 180,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                          blurRadius: 5,
-                                                          color: Colors
-                                                              .grey.shade300)
-                                                    ]),
-                                                child: Column(
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        CircleAvatar(
-                                                          radius: 25,
-                                                          backgroundImage:
-                                                              NetworkImage(
-                                                                  document[
-                                                                      'imagen']),
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 15,
-                                                        ),
-                                                        Text(
-                                                            document['emisor']),
-                                                      ],
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Row(
-                                                        children: [
-                                                          SizedBox(
-                                                              width: 300,
-                                                              child: Text(
-                                                                document[
-                                                                    'pregunta'],
-                                                                style:
-                                                                    const TextStyle(
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: snapshot.data!.docs
+                                          .map((DocumentSnapshot document) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Stack(children: [
+                                            Center(
+                                              child: Column(
+                                                children: [
+                                                  Stack(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets.all(12),
+                                                        width: 350,
+                                                        //height: 200,
+                                                        decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                    12),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                  blurRadius: 5,
                                                                   color: Colors
-                                                                      .black87,
+                                                                      .grey.shade300)
+                                                            ]),
+                                                        child: Column(
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                CircleAvatar(
+                                                                  radius: 20,
+                                                                  backgroundImage:
+                                                                      NetworkImage(
+                                                                          document[
+                                                                              'imagen']),
                                                                 ),
-                                                              )),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )),
-                                          ),
-                                          if (getCurrentProduct.userId ==
-                                              user!.uid) ...[
-                                            Positioned(
-                                                right: 15,
-                                                top: 0,
-                                                child: FloatingActionButton(
-                                                  onPressed: () {
-                                                    reply(
-                                                        sendEmail,
-                                                        document,
-                                                        getCurrentProduct,
-                                                        preguntaProvider,
-                                                        productId,
-                                                        (document.data() as Map)['user_id']
+                                                                const SizedBox(
+                                                                  width: 15,
+                                                                ),
+                                                                Text(
+                                                                    document['emisor']),
+                                                                const SizedBox(width: 20,),
+                                                              ],
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets.all(
+                                                                      8.0),
+                                                              child: Row(
+                                                                children: [
+                                                                  SizedBox(
+                                                                      width: 300,
+                                                                      child: Text(
+                                                                        document[
+                                                                            'pregunta'],
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          color: Colors
+                                                                              .black87,
+                                                                        ),
+                                                                      )),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Divider(thickness: 0.5, color: Colors.grey.shade300,),
+                                                            StreamBuilder<QuerySnapshot>(
+                                                                stream: FirebaseFirestore.instance
+                                                                    .collection('products')
+                                                                    .doc(
+                                                                    '${getCurrentProduct.productTitle} ID:${getCurrentProduct.productId}')
+                                                                    .collection('preguntas')
+                                                                    .orderBy('createAt', descending: true)
+                                                                    .snapshots(),
+                                                                builder: (BuildContext context,
+                                                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                                                  return snapshot.hasData
+                                                                      ? SizedBox(
+                                                                    //height: 60,
+                                                                    width: 550,
+                                                                    child: Column(
+                                                                      children: snapshot.data!.docs
+                                                                          .map((DocumentSnapshot document) {
+                                                                        return Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.end,
+                                                                          children: [
+                                                                            SizedBox(
+                                                                              width: 300,
+                                                                              child: Text(
+                                                                                document[
+                                                                                'respuesta'],
+                                                                                style:
+                                                                                const TextStyle(
+                                                                                  color: Colors
+                                                                                      .black87,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        );
+                                                                      }).toList(),
+                                                                    ),
+                                                                  )
+                                                                      : const CircularProgressIndicator();
+                                                                }),
+                                                          ],
+                                                        )),
+                                                      if (getCurrentProduct.userId ==
+                                                          user!.uid) ...[
+                                                        Positioned(
+                                                            right: 0,
+                                                            top: 0,
+                                                            child: FloatingActionButton(
+                                                              onPressed: () {
+                                                                reply(
+                                                                    sendEmail,
+                                                                    document,
+                                                                    getCurrentProduct,
+                                                                    preguntaProvider,
+                                                                    productId,
+                                                                    (document.data() as Map)['user_id']
 
-                                                    );
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.send_rounded,
-                                                    size: 25,
-                                                    color: Colors.deepPurple,
+                                                                );
+                                                              },
+                                                              child: const Icon(
+                                                                Icons.send_rounded,
+                                                                size: 25,
+                                                                color: Colors.deepPurple,
+                                                              ),
+                                                            )),
+                                                      ] else ...[
+                                                        const SizedBox.shrink()
+                                                      ]
+                                        ],
                                                   ),
-                                                )),
-                                          ] else ...[
-                                            const SizedBox.shrink()
-                                          ]
-                                        ]),
-                                      );
-                                    }).toList(),
+                                                ],
+                                              ),
+                                            ),
+                                          ]),
+                                        );
+                                      }).toList(),
+                                    ),
                                   ),
                                 )
                               : const CircularProgressIndicator();
@@ -1854,7 +1906,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         context: context,
         builder: (context) {
           return AlertDialog(
-              content: Container(
+              content: SizedBox(
                   height: 80,
                   width: 100,
                   child: Center(

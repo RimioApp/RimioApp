@@ -6,6 +6,7 @@ import 'package:Rimio/view/models/pregunta_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:googleapis/cloudsearch/v1.dart';
 import 'package:uuid/uuid.dart';
 
 class PreguntaProvider with ChangeNotifier {
@@ -18,6 +19,8 @@ class PreguntaProvider with ChangeNotifier {
 
   final database = FirebaseFirestore.instance.collection("products");
   final _auth = FirebaseAuth.instance;
+  final preguntaId = Uuid().v4();
+
 
 // Firebase
 
@@ -29,8 +32,10 @@ class PreguntaProvider with ChangeNotifier {
     required String? userImage,
     required String? emisorEmail,
     required BuildContext context,
+    String? id,
   }) async {
     final User? user = _auth.currentUser;
+
     if (user == null) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const Login();
@@ -39,16 +44,16 @@ class PreguntaProvider with ChangeNotifier {
     }
 
     try {
-      await database.doc('${productTitle} ID:$productId').collection('preguntas').add({
-
+      await database.doc('${productTitle} ID:$productId').collection('preguntas').doc('consulta').set({
         'emisor': user.displayName,
         'emisorEmail': emisorEmail,
         'remitente': displayName,
         'imagen': userImage,
         'pregunta': pregunta,
-        'user_id':user.uid,
-        'createAt':Timestamp.now(),
-
+        'user_id': user.uid,
+        'createAt': Timestamp.now().toDate()..difference(DateTime.now()).toString(),
+        'id': preguntaId,
+        'respuesta': '',
       });
       await showDialog(context: context, builder: (context){
         return const AlertDialog(
@@ -65,8 +70,9 @@ class PreguntaProvider with ChangeNotifier {
     required String respuesta,
     required String productId,
     required String productTitle,
-
     required BuildContext context,
+    String? id,
+
   }) async {
     final User? user = _auth.currentUser;
     if (user == null) {
@@ -77,10 +83,10 @@ class PreguntaProvider with ChangeNotifier {
     }
 
     try {
-      await database.doc('${productTitle} ID:$productId').collection('respuestas').add({
+
+      await database.doc('${productTitle} ID:$productId').collection('preguntas').doc('consulta').update({
 
         'respuesta': respuesta,
-        'createAt':Timestamp.now(),
 
       });
       await showDialog(context: context, builder: (context){

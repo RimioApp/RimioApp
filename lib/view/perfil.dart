@@ -777,7 +777,7 @@ class _perfilState extends State<perfil> {
                                                 width: 5,
                                               ),
                                               IconButton(
-                                                icon: Icon(
+                                                icon: const Icon(
                                                   Icons.help,
                                                   color: Colors.deepPurple,
                                                 ),
