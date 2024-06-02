@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:Rimio/view/productDetails.dart';
 import 'package:awesome_notifications/awesome_notifications.dart'
     hide NotificationModel;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 class AwesomeNotificationService {
@@ -16,8 +20,9 @@ class AwesomeNotificationService {
         'resource://drawable/rimio_iclauncher',
         [
           appNotificationChannel(
-              channelKey: "10001",
-              channelName: "RimioApp Notification",),
+            channelKey: "10001",
+            channelName: "RimioApp Notification",
+          ),
         ]);
     //requet notifcation permission if not allowed
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
@@ -26,6 +31,15 @@ class AwesomeNotificationService {
         // This is very important to not harm the user experience
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
+    });
+  }
+
+  static Future<void> listenAction(BuildContext context) async {
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: (ReceivedAction receivedAction) async {
+      var productId = receivedAction.payload!['productId'];
+      Navigator.pushNamed(context, ProductDetails.routeName,
+          arguments: productId);
     });
   }
 
@@ -87,16 +101,16 @@ class AwesomeNotificationService {
       groupKey = 'group_calls'}) {
     //firebase fall back channel key
     //fcm_fallback_notification_channel
-    return  NotificationChannel(
-            channelKey: channelKey,
-            channelName: channelName,
-            channelGroupKey: groupKey,
-            groupKey: groupKey,
-            criticalAlerts: true,
-            channelDescription: 'Notification channel for app',
-            importance: NotificationImportance.High,
-            playSound: true,
-          );
+    return NotificationChannel(
+      channelKey: channelKey,
+      channelName: channelName,
+      channelGroupKey: groupKey,
+      groupKey: groupKey,
+      criticalAlerts: true,
+      channelDescription: 'Notification channel for app',
+      importance: NotificationImportance.High,
+      playSound: true,
+    );
   }
 
   //
@@ -143,83 +157,26 @@ class AwesomeNotificationService {
   }
 
   static showNotification(payload) async {
-
+    var payloadStr = jsonEncode(payload);
+    Map load = jsonDecode(payloadStr);
+    List loadList = load.entries.toList();
+    Map<String, String?> convertedMap = <String, String?>{};
+    for (int index = 0; index < loadList.length; index++) {
+      var value = loadList[index].value;
+      var key = loadList[index].key;
+      convertedMap[key] = value;
+    }
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: Random().nextInt(10000),
         channelKey: "10001",
-        title: payload['title'],
+        title: convertedMap['title'],
         criticalAlert: true,
-        body: payload['body'],
+        body: convertedMap['body'],
         icon: "resource://drawable/rimio_iclauncher",
         notificationLayout: NotificationLayout.Default,
-        // payload: Map<String, String>.from(payload.toJson()),
+        payload: convertedMap,
       ),
     );
-  }
-
-  static getChannelId(type, title) {
-    // Random random = new Random();
-    // int randomNumber = random.nextInt(1000000);
-    // return randomNumber;
-
-    switch (type) {
-      case "calls_generated":
-        return "10001";
-      case "emergency_calls_generated":
-        return "10017";
-      case "calls_generated_reminder":
-        if (title.toString().toLowerCase().contains("2nd request")) {
-          return "10002";
-        } else if (title.toString().toLowerCase().contains("3rd request")) {
-          return "10003";
-        } else if (title.toString().toLowerCase().contains("4th request")) {
-          return "10004";
-        } else {
-          return "10005";
-        }
-
-      case "condition_correct":
-        return "10006";
-      case "backup_request":
-        return "10007";
-      case "backing_you_on_call":
-        return "10008";
-      case "cancel_call":
-        return "10009";
-      case "cover_call":
-        return "10010";
-      case "location_requested":
-        return "10011";
-      case "location_approved":
-        return "10012";
-      case "cancel_response":
-        return "10013";
-      case "call_back_active":
-        return "10014";
-      case "call_deleted":
-        return "10015";
-      case "uncorrect_call":
-        return "10016";
-    }
-
-    return "90000";
-  }
-
-  static String getGroupKey(channelId) {
-    if (channelId == "10001" ||
-        channelId == "10017" ||
-        channelId == "10002" ||
-        channelId == "10003" ||
-        channelId == "10004" ||
-        channelId == "10005") {
-      return "group_calls";
-    } else if (channelId == "10006" ||
-        channelId == "10007" ||
-        channelId == "10008" ||
-        channelId == "10009") {
-      return "group_info";
-    }
-    return "group_other";
   }
 }

@@ -15,7 +15,6 @@ import 'package:Rimio/view/models/product_model.dart';
 import 'package:Rimio/view/models/user_model.dart';
 import 'package:Rimio/view/rootScreen.dart';
 import 'package:Rimio/view/searchPage.dart';
-import 'package:Rimio/widgets/dynamic_link.dart';
 import 'package:Rimio/widgets/fav_button.dart';
 import 'package:Rimio/widgets/itemTile.dart';
 import 'package:action_slider/action_slider.dart';
@@ -27,7 +26,6 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -725,7 +723,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     ),
                                     child: IconButton(
                                         onPressed: () async {
-                                          shareLink(getCurrentProduct.productId);
+                                          shareLink(
+                                              getCurrentProduct.productId);
                                         },
                                         icon: const Icon(Icons.share))),
                               ],
@@ -1252,9 +1251,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                         getCurrentProduct,
                                                         preguntaProvider,
                                                         productId,
-                                                        (document.data() as Map)['user_id']
-
-                                                    );
+                                                        (document.data()
+                                                            as Map)['user_id']);
                                                   },
                                                   child: const Icon(
                                                     Icons.send_rounded,
@@ -1280,7 +1278,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   }
 
   void reply(sendEmail, document, getCurrentProduct, preguntaProvider,
-      productId,userId) async {
+      productId, userId) async {
     await showDialog(
         context: context,
         builder: (context) {
@@ -1366,7 +1364,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                           // var userId = getCurrentProduct.userId;
                           // var userId = FirebaseAuth.instance.currentUser!.uid;
 
-                          if(userId==null){
+                          if (userId == null) {
                             return;
                           }
                           var userDoc = await FirebaseFirestore.instance
@@ -1390,7 +1388,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             var data = {
                               "title": "Nouvelle Message",
                               "body": "$fullName a répondu à votre message",
-                              'productId': "productId",
+                              'productId': productId,
                               "type": "reply"
                             };
                             NotificationCallService()
@@ -1478,7 +1476,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         var data = {
           "title": "Nouvelle Message",
           "body": "$fullName a acheté votre article",
-          'productId': "productId",
+          'productId': getCurrentProduct.productId,
           "type": "reply"
         };
         NotificationCallService()
@@ -1931,7 +1929,7 @@ class _ProductDetailsState extends State<ProductDetails> {
             var data = {
               "title": "Nouvelle Message",
               "body": "$fullName vous a envoyé un message",
-              'productId': "productId",
+              'productId': productId,
               "type": "new_message"
             };
             NotificationCallService()

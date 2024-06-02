@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:Rimio/adHelper.dart';
@@ -25,10 +26,12 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:provider/provider.dart';
 
-import '../notification_call_service.dart';
+import '../awesome_notification_service.dart';
 import '../notificaton_service.dart';
 import '../widgets/dynamic_link.dart';
 //import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+Map<String, dynamic> jsonData = {};
 
 class homeScreen extends StatefulWidget {
   const homeScreen({super.key});
@@ -126,6 +129,8 @@ class _homeScreenState extends State<homeScreen> {
     _loadBannerAd();
     fetchBanners();
     updateFcm();
+    getJsonData();
+    AwesomeNotificationService.listenAction(context);
   }
 
   /// Fetching banners
@@ -447,4 +452,12 @@ class _homeScreenState extends State<homeScreen> {
         .doc(userId)
         .update({"fcm_token": token});
   }
+}
+
+Future getJsonData() async {
+  var docs = await FirebaseFirestore.instance
+      .collection("settings")
+      .doc("json_data")
+      .get();
+  jsonData = docs.data()!;
 }
