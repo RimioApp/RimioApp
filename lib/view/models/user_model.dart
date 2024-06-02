@@ -6,6 +6,8 @@ class UserModel with ChangeNotifier {
   final String? password;
   final Timestamp createdAt;
   final List userWish;
+  final List? userVenta;
+  final List? userPublish;
   final int points;
 
   UserModel({
@@ -20,6 +22,8 @@ class UserModel with ChangeNotifier {
     required this.userEmail,
     required this.createdAt,
     required this.userWish,
+    this.userVenta,
+    this.userPublish,
     required this.points});
 
 }

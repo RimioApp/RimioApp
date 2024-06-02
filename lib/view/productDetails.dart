@@ -6,6 +6,7 @@ import 'package:Rimio/providers/favoritos_provider.dart';
 import 'package:Rimio/providers/order_provider.dart';
 import 'package:Rimio/providers/preguntaProvider.dart';
 import 'package:Rimio/providers/product_provider.dart';
+import 'package:Rimio/providers/publish_provider.dart';
 import 'package:Rimio/providers/user_provider.dart';
 import 'package:Rimio/providers/venta_provider.dart';
 import 'package:Rimio/view/authPages/login.dart';
@@ -18,9 +19,11 @@ import 'package:Rimio/view/searchPage.dart';
 import 'package:Rimio/widgets/dynamic_link.dart';
 import 'package:Rimio/widgets/fav_button.dart';
 import 'package:Rimio/widgets/itemTile.dart';
+import 'package:Rimio/widgets/publish_widget.dart';
 import 'package:action_slider/action_slider.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -308,7 +311,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                   (orderProvider.getUserOrders
-                      .containsKey(productId) && int.parse(getCurrentProduct.productQty) < 1)///TODO: cambiar condicion
+                      .containsKey(productId) && int.parse(getCurrentProduct.productQty) < 1)
                       ? Stack(children: [
                           FancyShimmerImage(
                               boxFit: BoxFit.contain,
@@ -771,10 +774,173 @@ class _ProductDetailsState extends State<ProductDetails> {
                               ),
                               Row(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 15,
-                                    backgroundImage: NetworkImage(
-                                        getCurrentProduct.userImage),
+                                  GestureDetector(
+                                    onTap: () async {
+
+                                      var userMap = {};
+
+                                      /// FETCHING DE DATOS DEL USUARIO
+                                      try {
+                                        final userDoc = await FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(getCurrentProduct.userId)
+                                            .get();
+                                        userMap = userDoc.data()!;
+                                        final userDocDict =
+                                        userDoc.data() as Map<String, dynamic>?;
+
+                                        userModel = UserModel(
+                                          userId: userDoc.get('userId'),
+                                          userName: userDoc.get('userName'),
+                                          userLastName: userDoc.get('userLastName'),
+                                          displayName: userDoc.get('displayName'),
+                                          phone: userDoc.get('phone'),
+                                          location: userDoc.get('location'),
+                                          userImage: userDoc.get('userImage'),
+                                          userEmail: userDoc.get('userEmail'),
+                                          createdAt: userDoc.get('createdAt'),
+                                          points: userDoc.get('points'),
+                                          userWish: userDocDict!.containsKey("userWish")
+                                              ? userDoc.get("userWish")
+                                              : [],
+                                          userVenta: userDocDict!.containsKey("userVenta")
+                                              ? userDoc.get("userVenta")
+                                              : [],
+                                          userPublish: userDocDict!.containsKey("userPublish")
+                                              ? userDoc.get("userPublish")
+                                              : [],
+                                        );
+                                      } on FirebaseException catch (e) {
+                                        rethrow;
+                                      } catch (e) {
+                                        rethrow;
+                                      }
+
+                                      /// /// /// /// /// /// /// ///
+                                      showModalBottomSheet(context: context, builder: (context){
+
+                                        final date = userModel!.createdAt.toDate().year;
+                                        final publishProvider = Provider.of<PublishProvider>(context);
+
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context).size.width,
+                                            child: SingleChildScrollView(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: CircleAvatar(
+                                                          radius: 50,
+                                                          backgroundImage: NetworkImage(userModel!.userImage),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 20,),
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Column(
+                                                          children: [
+                                                            Text(userModel!.displayName, style: const TextStyle(fontSize: 25),),
+                                                            const SizedBox(height: 15,),
+                                                            if (userModel!.points < 10)
+                                                              Image.asset(
+                                                                  height: 30, 'assets/bronze.png'),
+                                                            if (userModel!.points >= 10 && userModel!.points < 30)
+                                                              Image.asset(
+                                                                  height: 30, 'assets/silver.png'),
+                                                            if (userModel!.points >= 30 && userModel!.points < 100)
+                                                              Image.asset(height: 30, 'assets/gold.png'),
+                                                            if (userModel!.points >= 1000)
+                                                              Image.asset(height: 30, 'assets/medal.png'),
+                                                            const SizedBox(width: 20)
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const Divider(),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.person, color: Colors.deepPurple,),
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text('${userModel!.userName} ${userModel!.userLastName}', style: TextStyle(fontSize: 17),),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const Divider(),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.location_pin, color: Colors.deepPurple,),
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text(userModel!.location, style: TextStyle(fontSize: 17),),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const Divider(),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.perm_contact_calendar_rounded, color: Colors.deepPurple,),
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text('Miembro desde: $date', style: TextStyle(fontSize: 17),),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const Divider(),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.music_note_rounded, color: Colors.deepPurple,),
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text('Artículos publicados: ${userModel!.userPublish!.length}', style: TextStyle(fontSize: 17),),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const Divider(),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.monetization_on_rounded, color: Colors.deepPurple,),
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text('Ventas: ${userModel!.userVenta!.length}', style: TextStyle(fontSize: 17),),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 1000,
+                                                    width: MediaQuery.of(context).size.width,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(top: 15.0, right: 8, left: 8),
+                                                      child: DynamicHeightGridView(
+                                                        itemCount: publishProvider.getUserPublish.length,
+                                                        crossAxisCount: 2,
+                                                        builder: (context, index){
+                                                          return PublishWidget(productId: publishProvider.getUserPublish.values.toList()[index].productId,);
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      enableDrag: true,
+                                      showDragHandle: true,
+                                      backgroundColor: Colors.white);
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 15,
+                                      backgroundImage: NetworkImage(
+                                          getCurrentProduct.userImage),
+                                    ),
                                   ),
                                   const SizedBox(
                                     width: 10,
@@ -2055,3 +2221,4 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
   }
 }
+
