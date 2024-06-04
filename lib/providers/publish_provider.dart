@@ -11,8 +11,12 @@ import 'package:uuid/uuid.dart';
 
 class PublishProvider with ChangeNotifier {
   final Map<String, PublishModel> _userPublishItems = {};
+  final Map<String, PublishModel> _productUserPublishItems = {};
   Map<String,  PublishModel> get getUserPublish {
     return _userPublishItems;
+  }
+  Map<String,  PublishModel> get getProductsUserPublish {
+    return _productUserPublishItems;
   }
 
   final usersPublishDb = FirebaseFirestore.instance.collection("users");
@@ -87,6 +91,32 @@ class PublishProvider with ChangeNotifier {
               publishId: userDoc.get("userPublish")[index]['publishId'],
               productId: userDoc.get("userPublish")[index]['productId'],
                   orderTime: Timestamp.now(),
+            ));
+      }
+    } catch (e) {
+      rethrow;
+    }
+    notifyListeners();
+  }
+
+  Future<void> fetchProductUserPublishlist({
+    required String productUserId,
+}) async {
+
+    try {
+      final userDoc = await usersPublishDb.doc(productUserId).get();
+      final data = userDoc.data();
+      if (data == null || !data.containsKey('userPublish')) {
+        return;
+      }
+      final length = userDoc.get("userPublish").length;
+      for (int index = 0; index < length; index++) {
+        _productUserPublishItems.putIfAbsent(
+            userDoc.get("userPublish")[index]['productId'],
+                () => PublishModel(
+              publishId: userDoc.get("userPublish")[index]['publishId'],
+              productId: userDoc.get("userPublish")[index]['productId'],
+              orderTime: Timestamp.now(),
             ));
       }
     } catch (e) {

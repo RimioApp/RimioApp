@@ -777,7 +777,7 @@ class _perfilState extends State<perfil> {
                                                 width: 5,
                                               ),
                                               IconButton(
-                                                icon: Icon(
+                                                icon: const Icon(
                                                   Icons.help,
                                                   color: Colors.deepPurple,
                                                 ),
@@ -913,24 +913,6 @@ class _perfilState extends State<perfil> {
                                       width: 10,
                                     ),
                                     Text('Vistos recientemente'),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              const Divider(),
-                              const SizedBox(height: 5),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) {
-                                    return const HistoryScreen();
-                                  }));
-                                },
-                                child: Row(
-                                  children: [
-                                    Image.asset(Assets.assetsImgHistory,height: 22,),
-                                    const SizedBox(width: 10),
-                                    Text('Historia'),
                                   ],
                                 ),
                               ),

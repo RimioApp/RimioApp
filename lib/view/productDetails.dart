@@ -13,6 +13,7 @@ import 'package:Rimio/view/authPages/login.dart';
 import 'package:Rimio/view/favoritos.dart';
 import 'package:Rimio/view/models/categoria_model.dart';
 import 'package:Rimio/view/models/product_model.dart';
+import 'package:Rimio/view/models/publish_model.dart';
 import 'package:Rimio/view/models/user_model.dart';
 import 'package:Rimio/view/rootScreen.dart';
 import 'package:Rimio/view/searchPage.dart';
@@ -23,6 +24,7 @@ import 'package:Rimio/widgets/publish_widget.dart';
 import 'package:action_slider/action_slider.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -154,6 +156,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     final orderProvider = Provider.of<OrderProvider>(context);
     final ventaProvider = Provider.of<VentaProvider>(context);
     final preguntaProvider = Provider.of<PreguntaProvider>(context);
+    final publishProvider = Provider.of<PublishProvider>(context);
 
     @override
     void dispose() {
@@ -311,7 +314,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
                   if (orderProvider.getUserOrders
-                      .containsKey(productId) && int.parse(getCurrentProduct.productQty) < 1) Stack(children: [
+                      .containsKey(productId) && int.parse(getCurrentProduct.productQty) < 1)
+                    Stack(
+                        children: [
                           FancyShimmerImage(
                               boxFit: BoxFit.contain,
                               height: size.height * 0.5,
@@ -814,6 +819,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       }
 
                                       /// /// /// /// /// /// /// ///
+
+
                                       showModalBottomSheet(context: context, builder: (context){
 
                                         final date = userModel!.createdAt.toDate().year;
@@ -865,7 +872,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       const Icon(Icons.person, color: Colors.deepPurple,),
                                                       Padding(
                                                         padding: const EdgeInsets.all(8.0),
-                                                        child: Text('${userModel!.userName} ${userModel!.userLastName}', style: TextStyle(fontSize: 17),),
+                                                        child: Text('${userModel!.userName} ${userModel!.userLastName}', style: const TextStyle(fontSize: 17),),
                                                       ),
                                                     ],
                                                   ),
@@ -875,7 +882,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       const Icon(Icons.location_pin, color: Colors.deepPurple,),
                                                       Padding(
                                                         padding: const EdgeInsets.all(8.0),
-                                                        child: Text(userModel!.location, style: TextStyle(fontSize: 17),),
+                                                        child: Text(userModel!.location, style: const TextStyle(fontSize: 17),),
                                                       ),
                                                     ],
                                                   ),
@@ -885,7 +892,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       const Icon(Icons.perm_contact_calendar_rounded, color: Colors.deepPurple,),
                                                       Padding(
                                                         padding: const EdgeInsets.all(8.0),
-                                                        child: Text('Miembro desde: $date', style: TextStyle(fontSize: 17),),
+                                                        child: Text('Miembro desde: $date', style: const TextStyle(fontSize: 17),),
                                                       ),
                                                     ],
                                                   ),
@@ -895,7 +902,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       const Icon(Icons.music_note_rounded, color: Colors.deepPurple,),
                                                       Padding(
                                                         padding: const EdgeInsets.all(8.0),
-                                                        child: Text('Artículos publicados: ${userModel!.userPublish!.length}', style: TextStyle(fontSize: 17),),
+                                                        child: Text('Artículos publicados: ${userModel!.userPublish!.length}', style: const TextStyle(fontSize: 17),),
                                                       ),
                                                     ],
                                                   ),
@@ -905,7 +912,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                       const Icon(Icons.monetization_on_rounded, color: Colors.deepPurple,),
                                                       Padding(
                                                         padding: const EdgeInsets.all(8.0),
-                                                        child: Text('Ventas: ${userModel!.userVenta!.length}', style: TextStyle(fontSize: 17),),
+                                                        child: Text('Ventas: ${userModel!.userVenta!.length}', style: const TextStyle(fontSize: 17),),
                                                       ),
                                                     ],
                                                   ),
@@ -1673,73 +1680,6 @@ class _ProductDetailsState extends State<ProductDetails> {
     phoneNumber,
     whatsappNumber,
   ) async {
-    /// FETCHING DE DATOS DEL USUARIO
-    try {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .get();
-
-      final userDocDict = userDoc.data();
-
-      String status = userDoc.data()!['profile_status'];
-
-      if (status == "pending") {
-        String message =
-            'Tu perfil no está verificado, por favor contacta con el administrador.';
-        disDialog(message);
-        return;
-      }
-
-      userModel = UserModel(
-        userId: userDoc.get('userId'),
-        userName: userDoc.get('userName'),
-        userLastName: userDoc.get('userLastName'),
-        displayName: userDoc.get('displayName'),
-        phone: userDoc.get('phone'),
-        location: userDoc.get('location'),
-        userImage: userDoc.get('userImage'),
-        userEmail: userDoc.get('userEmail'),
-        createdAt: userDoc.get('createdAt'),
-        points: userDoc.get('points'),
-        userWish:
-            userDocDict!.containsKey("userWish") ? userDoc.get("userWish") : [],
-      );
-
-      var userId = getCurrentProduct.userId;
-      // var userId = FirebaseAuth.instance.currentUser!.uid;
-      var userDocData = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .get();
-
-      if (userDocData.data() != null) {
-        var userName = userDocData.data()!['userName'];
-        var userLastName = userDocData.data()!['userLastName'];
-
-        String fullName = "$userName $userLastName";
-        var fcmToken = userDocData.data()!['fcm_token'];
-        if (fcmToken == null) return;
-        var notification = {
-          "title": "Nuevo Mensaje",
-          "body": "¡te acaban de realizar una compra!",
-        };
-        var data = {
-          "title": "Nuevo Mensaje",
-          "body": "¡te acaban de realizar una compra!",
-          'productId': getCurrentProduct.productId,
-          "type": "reply"
-        };
-        NotificationCallService()
-            .sendNotification(notification, data, fcmToken);
-      }
-    } on FirebaseException catch (e) {
-      rethrow;
-    } catch (e) {
-      rethrow;
-    }
-
-    /// /// /// /// /// /// /// ///
 
     showDialog(
         context: context,
@@ -1868,6 +1808,71 @@ class _ProductDetailsState extends State<ProductDetails> {
                             await Future.delayed(const Duration(seconds: 3));
                             controller.success();
 
+                            try {
+                              final userDoc = await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(user!.uid)
+                                  .get();
+
+                              final userDocDict = userDoc.data();
+
+                              String status = userDoc.data()!['profile_status'];
+
+                              if (status == "pending") {
+                                String message =
+                                    'Tu perfil no está verificado, por favor contacta con el administrador.';
+                                disDialog(message);
+                                return;
+                              }
+
+                              userModel = UserModel(
+                                userId: userDoc.get('userId'),
+                                userName: userDoc.get('userName'),
+                                userLastName: userDoc.get('userLastName'),
+                                displayName: userDoc.get('displayName'),
+                                phone: userDoc.get('phone'),
+                                location: userDoc.get('location'),
+                                userImage: userDoc.get('userImage'),
+                                userEmail: userDoc.get('userEmail'),
+                                createdAt: userDoc.get('createdAt'),
+                                points: userDoc.get('points'),
+                                userWish:
+                                userDocDict!.containsKey("userWish") ? userDoc.get("userWish") : [],
+                              );
+
+                              var userId = getCurrentProduct.userId;
+                              // var userId = FirebaseAuth.instance.currentUser!.uid;
+                              var userDocData = await FirebaseFirestore.instance
+                                  .collection("users")
+                                  .doc(userId)
+                                  .get();
+
+                              if (userDocData.data() != null) {
+                                var userName = userDocData.data()!['userName'];
+                                var userLastName = userDocData.data()!['userLastName'];
+
+                                String fullName = "$userName $userLastName";
+                                var fcmToken = userDocData.data()!['fcm_token'];
+                                if (fcmToken == null) return;
+                                var notification = {
+                                  "title": "Nuevo Mensaje",
+                                  "body": "¡Te acaban de realizar una compra por ${getCurrentProduct.productTitle}! Revisa tu correo para obtener mayor información del comprador",
+                                };
+                                var data = {
+                                  "title": "Nuevo Mensaje",
+                                  "body": "¡Te acaban de realizar una compra por ${getCurrentProduct.productTitle}! Revisa tu correo para obtener mayor información del comprador",
+                                  'productId': getCurrentProduct.productId,
+                                  "type": "reply"
+                                };
+                                NotificationCallService()
+                                    .sendNotification(notification, data, fcmToken);
+                              }
+                            } on FirebaseException catch (e) {
+                              rethrow;
+                            } catch (e) {
+                              rethrow;
+                            }
+
                             /// FETCHING DE DATOS DEL USUARIO
                             try {
                               final userDoc = await FirebaseFirestore.instance
@@ -1909,19 +1914,19 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   .get();
 
                               if (userDocData.data() != null) {
-                                var userName = userDocData.data()!['userName'];
-                                var userLastName = userDocData.data()!['userLastName'];
 
-                                String fullName = "$userName $userLastName";
+                                var userName = userModel.displayName;
+                                // var userLastName = userDocData.data()!['userLastName'];
+
                                 var fcmToken = userDocData.data()!['fcm_token'];
                                 if (fcmToken == null) return;
                                 var notification = {
                                   "title": "Nuevo Mensaje",
-                                  "body": "$fullName acaba de ofertar}",
+                                  "body": "$userName acaba de ofertar por ${getCurrentProduct.productTitle}",
                                 };
                                 var data = {
                                   "title": "Nuevo Mensaje",
-                                  "body": "$fullName acaba de ofertar",
+                                  "body": "$userName acaba de ofertar por ${getCurrentProduct.productTitle}",
                                   'productId': "productId",
                                   "type": "reply"
                                 };
